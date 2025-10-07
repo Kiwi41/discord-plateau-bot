@@ -337,14 +337,9 @@ async function processOneFriday(guild, forumChannel, fridayDate, allEvents = nul
             eventTime = '20:30'; // Heure par défaut basée sur le pattern observé
             eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)'; // Lieu avec lien Google Maps
             
-            // Utiliser l'événement récurrent si disponible, sinon lien d'inscription
-            if (config.eventId) {
-                eventUrl = `https://discord.com/events/${config.guildId}/${config.eventId}`;
-                eventText = `[Rejoindre l'événement Discord](${eventUrl})`;
-            } else {
-                eventUrl = config.registrationUrl;
-                eventText = `[Lien d'inscription](${eventUrl})`;
-            }
+            // En cas d'erreur avec EVENT_ID, utiliser le lien d'inscription par défaut
+            eventUrl = config.registrationUrl;
+            eventText = `[Lien d'inscription](${eventUrl})`;
         }
         
         console.log('⚠️  Utilisation de l\'événement récurrent ou des valeurs par défaut');
@@ -567,8 +562,26 @@ async function createForumPost() {
             return;
         }
 
+        // Récupérer les événements Discord pour avoir accès aux bonnes informations
+        console.log('🔍 Récupération des événements Discord...');
+        let allEvents = null;
+        try {
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Timeout lors de la récupération des événements')), 10000)
+            );
+            
+            allEvents = await Promise.race([
+                guild.scheduledEvents.fetch(),
+                timeoutPromise
+            ]);
+            console.log(`📅 ${allEvents.size} événements trouvés sur le serveur`);
+        } catch (error) {
+            console.warn('⚠️  Impossible de récupérer les événements Discord:', error.message);
+            console.log('🔄 Le traitement continuera avec les valeurs par défaut');
+        }
+
         const nextFriday = getNextFriday();
-        const result = await processOneFriday(guild, forumChannel, nextFriday);
+        const result = await processOneFriday(guild, forumChannel, nextFriday, allEvents);
         
         if (result.action === 'error') {
             console.error('❌ Erreur lors du traitement:', result.error);
