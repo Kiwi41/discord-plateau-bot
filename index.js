@@ -337,27 +337,95 @@ async function processOneFriday(guild, forumChannel, fridayDate, allEvents = nul
             eventTime = '20:30'; // Heure par défaut basée sur le pattern observé
             eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)'; // Lieu avec lien Google Maps
             
-            // En cas d'erreur avec EVENT_ID, utiliser le lien d'inscription par défaut
-            eventUrl = config.registrationUrl;
-            eventText = `[Lien d'inscription](${eventUrl})`;
+            // Utiliser l'événement récurrent si disponible, sinon lien d'inscription
+            if (config.eventId) {
+                eventUrl = `https://discord.com/events/${config.guildId}/${config.eventId}`;
+                eventText = `[Rejoindre l'événement Discord](${eventUrl})`;
+            } else {
+                eventUrl = config.registrationUrl;
+                eventText = `[Lien d'inscription](${eventUrl})`;
+            }
         }
         
         console.log('⚠️  Utilisation de l\'événement récurrent ou des valeurs par défaut');
     } else {
-        // Valeurs par défaut - essayer d'utiliser l'événement récurrent même sans date
-        eventDate = formattedDate;
-        eventTime = '20:30'; // Heure cohérente basée sur les autres événements
-        eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)'; // Lieu cohérent avec lien Google Maps
+        // Pas d'événement spécifique trouvé, chercher un événement récurrent des soirées plateaux
+        console.log('🔍 Recherche d\'un événement récurrent des soirées plateaux...');
+        let recurringEvent = null;
         
-        // Utiliser l'événement récurrent si disponible, sinon lien d'inscription
-        if (config.eventId) {
-            eventUrl = `https://discord.com/events/${config.guildId}/${config.eventId}`;
-            eventText = `[Rejoindre l'événement Discord](${eventUrl})`;
-            console.log('⚠️  Utilisation du lien vers l\'événement récurrent');
-        } else {
-            eventUrl = config.registrationUrl;
-            eventText = `[Lien d'inscription](${eventUrl})`;
-            console.log('⚠️  Utilisation de l\'URL d\'inscription générique');
+        if (allEvents && allEvents.size > 0) {
+            // Chercher un événement récurrent avec des mots-clés pertinents
+            recurringEvent = allEvents.find(event => {
+                const eventName = event.name.toLowerCase();
+                const keywords = ['plateau', 'soirée', 'récurrent', 'hebdomadaire', 'vendredi'];
+                const hasKeyword = keywords.some(keyword => eventName.includes(keyword));
+                return hasKeyword && event.scheduledStartAt;
+            });
+            
+            if (recurringEvent) {
+                console.log(`✅ Événement récurrent trouvé: ${recurringEvent.name} (ID: ${recurringEvent.id})`);
+                
+                // Utiliser les informations de l'événement récurrent
+                const eventStart = new Date(recurringEvent.scheduledStartAt);
+                eventDate = formattedDate; // Garde la date calculée du vendredi
+                eventTime = eventStart.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    timeZone: config.timezone 
+                });
+                
+                // Récupération du lieu selon le type d'événement
+                if (recurringEvent.entityType === 3) { // EXTERNAL
+                    if (recurringEvent.entityMetadata?.location) {
+                        let location = recurringEvent.entityMetadata.location;
+                        if (location.includes('https://www.google.com/maps')) {
+                            const parts = location.split(' – ');
+                            if (parts.length > 1) {
+                                const placeName = parts[0].trim();
+                                const mapUrl = parts[1].trim();
+                                eventLocation = `📍 [${placeName}](${mapUrl})`;
+                            } else {
+                                eventLocation = `📍 ${location}`;
+                            }
+                        } else {
+                            eventLocation = `📍 ${location}`;
+                        }
+                    } else {
+                        eventLocation = 'Lieu externe (non spécifié)';
+                    }
+                } else if (recurringEvent.entityType === 2) { // VOICE
+                    if (recurringEvent.channel) {
+                        eventLocation = `🔊 ${recurringEvent.channel.name}`;
+                    } else {
+                        eventLocation = 'Canal vocal (non spécifié)';
+                    }
+                } else {
+                    eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)';
+                }
+                
+                eventUrl = `https://discord.com/events/${config.guildId}/${recurringEvent.id}`;
+                eventText = `[Rejoindre l'événement Discord](${eventUrl})`;
+                recurringEventData = recurringEvent; // Stocker pour utiliser la description
+                console.log('✅ Utilisation des informations de l\'événement récurrent trouvé');
+            }
+        }
+        
+        // Si aucun événement récurrent trouvé, utiliser les valeurs par défaut
+        if (!recurringEvent) {
+            eventDate = formattedDate;
+            eventTime = '20:30'; // Heure cohérente basée sur les autres événements
+            eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)';
+            
+            // Utiliser l'événement récurrent si EVENT_ID configuré, sinon lien d'inscription
+            if (config.eventId) {
+                eventUrl = `https://discord.com/events/${config.guildId}/${config.eventId}`;
+                eventText = `[Rejoindre l'événement Discord](${eventUrl})`;
+                console.log('⚠️  Utilisation du lien vers l\'événement récurrent configuré');
+            } else {
+                eventUrl = config.registrationUrl;
+                eventText = `[Lien d'inscription](${eventUrl})`;
+                console.log('⚠️  Utilisation de l\'URL d\'inscription générique');
+            }
         }
     }
     
@@ -562,26 +630,8 @@ async function createForumPost() {
             return;
         }
 
-        // Récupérer les événements Discord pour avoir accès aux bonnes informations
-        console.log('🔍 Récupération des événements Discord...');
-        let allEvents = null;
-        try {
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Timeout lors de la récupération des événements')), 10000)
-            );
-            
-            allEvents = await Promise.race([
-                guild.scheduledEvents.fetch(),
-                timeoutPromise
-            ]);
-            console.log(`📅 ${allEvents.size} événements trouvés sur le serveur`);
-        } catch (error) {
-            console.warn('⚠️  Impossible de récupérer les événements Discord:', error.message);
-            console.log('🔄 Le traitement continuera avec les valeurs par défaut');
-        }
-
         const nextFriday = getNextFriday();
-        const result = await processOneFriday(guild, forumChannel, nextFriday, allEvents);
+        const result = await processOneFriday(guild, forumChannel, nextFriday);
         
         if (result.action === 'error') {
             console.error('❌ Erreur lors du traitement:', result.error);
