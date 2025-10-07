@@ -71,6 +71,36 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Fonction utilitaire pour récupérer les événements Discord avec retry
+async function fetchDiscordEventsWithRetry(guild, maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`📡 Tentative ${attempt}/${maxRetries} de récupération des événements...`);
+            
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Timeout lors de la récupération des événements')), 15000)
+            );
+            
+            const events = await Promise.race([
+                guild.scheduledEvents.fetch(),
+                timeoutPromise
+            ]);
+            
+            console.log(`✅ ${events.size} événements trouvés sur le serveur`);
+            return events;
+            
+        } catch (error) {
+            console.warn(`⚠️  Tentative ${attempt}/${maxRetries} échouée:`, error.message);
+            
+            if (attempt < maxRetries) {
+                console.log(`⏳ Pause de ${attempt * 2} secondes avant nouvelle tentative...`);
+                await sleep(attempt * 2000); // Pause progressive: 2s, 4s, 6s
+            }
+        }
+    }
+    return null;
+}
+
 // Fonction pour trouver l'événement Discord du vendredi
 function findFridayEvent(allEvents, targetDate) {
     try {
@@ -528,22 +558,18 @@ async function processNextFourFridays() {
             console.log(`   ${index + 1}. ${formatDate(friday)}`);
         });
         
-        // Récupérer tous les événements une seule fois au début pour éviter les blocages
+        // Récupérer tous les événements avec retry et timeout étendu
         console.log('🔍 Récupération des événements Discord...');
         let allEvents = null;
+        
         try {
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Timeout lors de la récupération des événements')), 10000)
-            );
-            
-            allEvents = await Promise.race([
-                guild.scheduledEvents.fetch(),
-                timeoutPromise
-            ]);
-            console.log(`📅 ${allEvents.size} événements trouvés sur le serveur`);
+            allEvents = await fetchDiscordEventsWithRetry(guild);
+            if (!allEvents) {
+                console.warn('⚠️  Impossible de récupérer les événements Discord après plusieurs tentatives');
+                console.log('🔄 Le traitement continuera avec les valeurs par défaut');
+            }
         } catch (error) {
-            console.warn('⚠️  Impossible de récupérer les événements Discord:', error.message);
-            console.log('🔄 Le traitement continuera avec les valeurs par défaut');
+            console.error('❌ Erreur fatale lors de la récupération des événements:', error);
         }
 
         const results = {
@@ -630,8 +656,22 @@ async function createForumPost() {
             return;
         }
 
+        // Récupérer les événements Discord avec la même logique robuste que processNextFourFridays
+        console.log('🔍 Récupération des événements Discord...');
+        let allEvents = null;
+        
+        try {
+            allEvents = await fetchDiscordEventsWithRetry(guild);
+            if (!allEvents) {
+                console.warn('⚠️  Impossible de récupérer les événements Discord après plusieurs tentatives');
+                console.log('🔄 Le traitement continuera avec les valeurs par défaut');
+            }
+        } catch (error) {
+            console.error('❌ Erreur fatale lors de la récupération des événements:', error);
+        }
+
         const nextFriday = getNextFriday();
-        const result = await processOneFriday(guild, forumChannel, nextFriday);
+        const result = await processOneFriday(guild, forumChannel, nextFriday, allEvents);
         
         if (result.action === 'error') {
             console.error('❌ Erreur lors du traitement:', result.error);
