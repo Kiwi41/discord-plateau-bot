@@ -1,0 +1,49 @@
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+  
+  <!-- Titre -->
+  <text x="300" y="25" font="bold 16px sans-serif" text-anchor="middle">🎲 Bot Discord Plateaux - Architecture</text>
+  
+  <!-- Discord -->
+  <rect x="20" y="50" width="120" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="8"/>
+  <text x="80" y="75" font="12px sans-serif" text-anchor="middle">🎮 Discord</text>
+  <text x="80" y="90" font="12px sans-serif" text-anchor="middle">Serveur</text>
+  <text x="80" y="105" font="12px sans-serif" text-anchor="middle">Forum</text>
+  <text x="80" y="120" font="12px sans-serif" text-anchor="middle">Événements</text>
+  
+  <!-- Bot Heroku -->
+  <rect x="240" y="50" width="120" height="80" fill="#fff3e0" stroke="#f57c00" stroke-width="2" rx="12"/>
+  <text x="300" y="75" font="12px sans-serif" text-anchor="middle">☁️ Heroku</text>
+  <text x="300" y="90" font="12px sans-serif" text-anchor="middle">Bot Node.js</text>
+  <text x="300" y="105" font="12px sans-serif" text-anchor="middle">24h/24</text>
+  <text x="300" y="120" font="12px sans-serif" text-anchor="middle">Cron jobs</text>
+  
+  <!-- Utilisateurs -->
+  <rect x="460" y="50" width="120" height="80" fill="#e8f5e8" stroke="#388e3c" stroke-width="2" rx="8"/>
+  <text x="520" y="75" font="12px sans-serif" text-anchor="middle">👥 Utilisateurs</text>
+  <text x="520" y="90" font="12px sans-serif" text-anchor="middle">Posts Forum</text>
+  <text x="520" y="105" font="12px sans-serif" text-anchor="middle">Soirées</text>
+  <text x="520" y="120" font="12px sans-serif" text-anchor="middle">Plateaux</text>
+  
+  <!-- Processus -->
+  <rect x="130" y="180" width="340" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="8" style="fill: #f3e5f5; stroke: #7b1fa2;"/>
+  <text x="300" y="200" font="12px sans-serif" text-anchor="middle">🔄 Processus automatique</text>
+  <text x="300" y="215" font="12px sans-serif" text-anchor="middle">1. Récupération événements Discord</text>
+  <text x="300" y="230" font="12px sans-serif" text-anchor="middle">2. Traitement 4 prochains vendredis</text>
+  <text x="300" y="245" font="12px sans-serif" text-anchor="middle">3. Création/Mise à jour posts forum</text>
+  
+  <!-- Flèches -->
+  <line x1="140" y1="90" x2="240" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="190" y="85" font="12px sans-serif" text-anchor="middle" style="font-size: 10px;">API Discord</text>
+  
+  <line x1="360" y1="90" x2="460" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="410" y="85" font="12px sans-serif" text-anchor="middle" style="font-size: 10px;">Posts</text>
+  
+  <line x1="300" y1="130" x2="300" y2="180" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="320" y="155" font="12px sans-serif" text-anchor="middle" style="font-size: 10px;">Samedi 3h</text>
+</svg>

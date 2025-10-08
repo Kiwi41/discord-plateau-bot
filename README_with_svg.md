@@ -94,31 +94,56 @@ Bot Discord intelligent qui crée et met à jour automatiquement des posts dans 
 <tr>
 <td align="center" width="20%">
 <a href="docs/README.md">
-<img src="docs/inline_svg/architecture.svg" width="120" alt="Architecture"/>
+<svg width="120" height="90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="100" height="70" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="8"/>
+  <text x="60" y="35" font="10px sans-serif" text-anchor="middle">🏗️ Architecture</text>
+  <text x="60" y="50" font="8px sans-serif" text-anchor="middle">Composants</text>
+  <text x="60" y="65" font="8px sans-serif" text-anchor="middle">système</text>
+</svg>
 <br><sub><b>🏗️ Architecture</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
 <a href="docs/README.md#processus-de-déploiement">
-<img src="docs/inline_svg/deployment.svg" width="120" alt="Déploiement"/>
+<svg width="120" height="90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="100" height="70" fill="#fff3e0" stroke="#f57c00" stroke-width="2" rx="8"/>
+  <text x="60" y="35" font="10px sans-serif" text-anchor="middle">🚀 Déploiement</text>
+  <text x="60" y="50" font="8px sans-serif" text-anchor="middle">Heroku</text>
+  <text x="60" y="65" font="8px sans-serif" text-anchor="middle">Production</text>
+</svg>
 <br><sub><b>🚀 Déploiement</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
 <a href="docs/README.md#flux-des-données">
-<img src="docs/inline_svg/data_flow.svg" width="120" alt="Flux de données"/>
+<svg width="120" height="90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="100" height="70" fill="#e8f5e8" stroke="#388e3c" stroke-width="2" rx="8"/>
+  <text x="60" y="35" font="10px sans-serif" text-anchor="middle">📊 Flux données</text>
+  <text x="60" y="50" font="8px sans-serif" text-anchor="middle">Discord →</text>
+  <text x="60" y="65" font="8px sans-serif" text-anchor="middle">Forum</text>
+</svg>
 <br><sub><b>📊 Flux de données</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
 <a href="docs/FAQ.md">
-<img src="docs/inline_svg/user_workflow.svg" width="120" alt="Workflow utilisateur"/>
+<svg width="120" height="90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="100" height="70" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="8"/>
+  <text x="60" y="35" font="10px sans-serif" text-anchor="middle">🎮 Workflow</text>
+  <text x="60" y="50" font="8px sans-serif" text-anchor="middle">Utilisation</text>
+  <text x="60" y="65" font="8px sans-serif" text-anchor="middle">communauté</text>
+</svg>
 <br><sub><b>🎮 Workflow</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
 <a href="docs/FAQ.md#--comment-fonctionne-le-cycle-de-vie-du-bot-">
-<img src="docs/inline_svg/bot_lifecycle.svg" width="120" alt="Cycle de vie"/>
+<svg width="120" height="90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="100" height="70" fill="#ffebee" stroke="#f44336" stroke-width="2" rx="8"/>
+  <text x="60" y="35" font="10px sans-serif" text-anchor="middle">🔄 Cycle</text>
+  <text x="60" y="50" font="8px sans-serif" text-anchor="middle">Bot lifecycle</text>
+  <text x="60" y="65" font="8px sans-serif" text-anchor="middle">& processus</text>
+</svg>
 <br><sub><b>🔄 Cycle de vie</b></sub>
 </a>
 </td>

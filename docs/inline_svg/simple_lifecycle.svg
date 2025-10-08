@@ -1,0 +1,81 @@
+<svg width="500" height="350" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" 
+            refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#666" />
+    </marker>
+  </defs>
+  
+  <!-- Titre -->
+  <text x="250" y="20" font="bold 16px sans-serif" text-anchor="middle">🔄 Cycle de vie du bot Discord</text>
+  
+  <!-- Démarrage -->
+  <ellipse cx="250" cy="50" rx="60" ry="20" fill="#4caf50" stroke="#388e3c" stroke-width="2"/>
+  <text x="250" y="47" font="12px sans-serif" text-anchor="middle" fill="white">🚀 Démarrage</text>
+  <text x="250" y="57" font="9px sans-serif" text-anchor="middle" fill="white">node index.js</text>
+  
+  <!-- Initialisation -->
+  <rect x="180" y="80" width="140" height="40" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="8"/>
+  <text x="250" y="97" font="12px sans-serif" text-anchor="middle">⚙️ Initialisation</text>
+  <text x="250" y="107" font="9px sans-serif" text-anchor="middle">Config + Discord + Permissions</text>
+  
+  <!-- Bot connecté -->
+  <rect x="180" y="140" width="140" height="30" fill="#e8f5e8" stroke="#388e3c" stroke-width="2" rx="8"/>
+  <text x="250" y="157" font="12px sans-serif" text-anchor="middle">✅ Bot connecté et prêt</text>
+  
+  <!-- Boucle principale -->
+  <rect x="50" y="200" width="100" height="40" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="8"/>
+  <text x="100" y="217" font="12px sans-serif" text-anchor="middle">👂 Écoute</text>
+  <text x="100" y="227" font="9px sans-serif" text-anchor="middle">Commandes/Cron</text>
+  
+  <!-- Traitement -->
+  <rect x="200" y="200" width="100" height="40" fill="#e8f5e8" stroke="#388e3c" stroke-width="2" rx="8"/>
+  <text x="250" y="217" font="12px sans-serif" text-anchor="middle">📋 Traitement</text>
+  <text x="250" y="227" font="9px sans-serif" text-anchor="middle">Événements</text>
+  
+  <!-- Gestion erreur -->
+  <rect x="350" y="200" width="100" height="40" fill="#ffebee" stroke="#f44336" stroke-width="2" rx="8"/>
+  <text x="400" y="217" font="12px sans-serif" text-anchor="middle">🛠️ Erreurs</text>
+  <text x="400" y="227" font="9px sans-serif" text-anchor="middle">Retry + Log</text>
+  
+  <!-- Attente -->
+  <rect x="200" y="280" width="100" height="30" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" rx="8"/>
+  <text x="250" y="297" font="12px sans-serif" text-anchor="middle">😴 Attente prochaine activité</text>
+  
+  <!-- Arrêt -->
+  <ellipse cx="80" cy="320" rx="50" ry="20" fill="#ffebee" stroke="#f44336" stroke-width="2" rx="8"/>
+  <text x="80" y="317" font="9px sans-serif" text-anchor="middle" fill="white">🛑 Arrêt</text>
+  <text x="80" y="327" font="9px sans-serif" text-anchor="middle" fill="white">(signal/erreur)</text>
+  
+  <!-- Flèches principales -->
+  <line x1="250" y1="70" x2="250" y2="80" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="250" y1="120" x2="250" y2="140" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="250" y1="170" x2="100" y2="200" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Boucle principale -->
+  <line x1="150" y1="220" x2="200" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="175" y="215" font="9px sans-serif" text-anchor="middle">Activité</text>
+  
+  <!-- Vers traitement -->
+  <line x1="300" y1="220" x2="350" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="325" y="215" font="9px sans-serif" text-anchor="middle">Erreur</text>
+  
+  <!-- Vers attente -->
+  <line x1="250" y1="240" x2="250" y2="280" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="240" x2="250" y2="280" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Retour boucle -->
+  <path d="M 200,295 Q 150,300 120,270 Q 90,240 95,220" 
+        fill="none" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="140" y="275" font="9px sans-serif" text-anchor="middle">Réveil</text>
+  
+  <!-- Vers arrêt -->
+  <line x1="150" y1="240" x2="80" y2="300" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" stroke="#f44336"/>
+  <text x="105" y="275" font="9px sans-serif" text-anchor="middle" fill="#f44336">Signal</text>
+  
+  <!-- Annotations temporelles -->
+  <text x="360" y="50" font="9px sans-serif" text-anchor="middle" fill="#666">• Démarrage: ~2-3 sec</text>
+  <text x="360" y="65" font="9px sans-serif" text-anchor="middle" fill="#666">• Cron: samedi 3h00</text>
+  <text x="360" y="80" font="9px sans-serif" text-anchor="middle" fill="#666">• Traitement: ~30 sec</text>
+  <text x="360" y="95" font="9px sans-serif" text-anchor="middle" fill="#666">• Retry: 2s → 4s → 6s</text>
+</svg>
