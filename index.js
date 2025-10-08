@@ -190,6 +190,13 @@ async function updateExistingPost(thread, embed, eventInfo) {
         const oldEventText = currentFields.find(f => f.name === '🎯 Événement Discord')?.value || '';
         const oldDescription = currentEmbed.description || '';
         
+        // Logs de debugging pour comprendre les comparaisons
+        console.log('🔍 Comparaison des valeurs:');
+        console.log(`   🕖 Heure: "${oldTime}" vs "${eventInfo.time}" → ${oldTime === eventInfo.time ? 'identique' : 'différent'}`);
+        console.log(`   📍 Lieu: "${oldLocation}" vs "${eventInfo.location}" → ${oldLocation === eventInfo.location ? 'identique' : 'différent'}`);
+        console.log(`   🎯 Événement: "${oldEventText}" vs "${eventInfo.eventText}" → ${oldEventText === eventInfo.eventText ? 'identique' : 'différent'}`);
+        console.log(`   📝 Description: ${oldDescription.length} vs ${eventInfo.description.length} caractères → ${oldDescription === eventInfo.description ? 'identique' : 'différent'}`);
+        
         // Comparaison avec les nouvelles valeurs
         const hasTimeChanged = oldTime !== eventInfo.time;
         const hasLocationChanged = oldLocation !== eventInfo.location;
@@ -401,8 +408,37 @@ async function processOneFriday(guild, forumChannel, fridayDate, allEvents = nul
             if (recurringEvent) {
                 console.log(`✅ Événement récurrent trouvé: ${recurringEvent.name} (ID: ${recurringEvent.id})`);
                 
-                // Utiliser les informations de l'événement récurrent
-                const eventStart = new Date(recurringEvent.scheduledStartAt);
+                // Chercher d'abord s'il existe un événement spécifique pour ce vendredi basé sur l'événement récurrent
+                let specificEvent = null;
+                if (allEvents && allEvents.size > 0) {
+                    // Chercher un événement spécifique qui correspond à ce vendredi et qui est lié à l'événement récurrent
+                    specificEvent = allEvents.find(event => {
+                        if (!event.scheduledStartAt) return false;
+                        
+                        const eventDate = new Date(event.scheduledStartAt);
+                        const targetDay = fridayDate.toDateString();
+                        const eventDay = eventDate.toDateString();
+                        
+                        // Chercher un événement avec un nom similaire ou qui correspond au pattern
+                        const eventName = event.name.toLowerCase();
+                        const recurringName = recurringEvent.name.toLowerCase();
+                        const nameMatch = eventName.includes('plateau') || eventName.includes('soirée') || 
+                                        eventName === recurringName || eventName.includes(recurringName.split(' ')[0]);
+                        
+                        return eventDay === targetDay && nameMatch && event.id !== recurringEvent.id;
+                    });
+                }
+                
+                // Utiliser l'événement spécifique s'il existe, sinon l'événement récurrent
+                const targetEvent = specificEvent || recurringEvent;
+                if (specificEvent) {
+                    console.log(`✅ Événement spécifique trouvé pour ce vendredi: ${specificEvent.name} (ID: ${specificEvent.id})`);
+                } else {
+                    console.log(`📅 Utilisation de l'événement récurrent: ${recurringEvent.name} (ID: ${recurringEvent.id})`);
+                }
+                
+                // Utiliser les informations de l'événement (spécifique ou récurrent)
+                const eventStart = new Date(targetEvent.scheduledStartAt);
                 eventDate = formattedDate; // Garde la date calculée du vendredi
                 eventTime = eventStart.toLocaleTimeString('fr-FR', { 
                     hour: '2-digit', 
@@ -411,9 +447,9 @@ async function processOneFriday(guild, forumChannel, fridayDate, allEvents = nul
                 });
                 
                 // Récupération du lieu selon le type d'événement
-                if (recurringEvent.entityType === 3) { // EXTERNAL
-                    if (recurringEvent.entityMetadata?.location) {
-                        let location = recurringEvent.entityMetadata.location;
+                if (targetEvent.entityType === 3) { // EXTERNAL
+                    if (targetEvent.entityMetadata?.location) {
+                        let location = targetEvent.entityMetadata.location;
                         if (location.includes('https://www.google.com/maps')) {
                             const parts = location.split(' – ');
                             if (parts.length > 1) {
@@ -429,9 +465,9 @@ async function processOneFriday(guild, forumChannel, fridayDate, allEvents = nul
                     } else {
                         eventLocation = 'Lieu externe (non spécifié)';
                     }
-                } else if (recurringEvent.entityType === 2) { // VOICE
-                    if (recurringEvent.channel) {
-                        eventLocation = `🔊 ${recurringEvent.channel.name}`;
+                } else if (targetEvent.entityType === 2) { // VOICE
+                    if (targetEvent.channel) {
+                        eventLocation = `🔊 ${targetEvent.channel.name}`;
                     } else {
                         eventLocation = 'Canal vocal (non spécifié)';
                     }
@@ -439,15 +475,19 @@ async function processOneFriday(guild, forumChannel, fridayDate, allEvents = nul
                     eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)';
                 }
                 
-                eventUrl = `https://discord.com/events/${config.guildId}/${recurringEvent.id}`;
+                // Utiliser l'ID de l'événement approprié (spécifique si disponible, sinon récurrent)
+                eventUrl = `https://discord.com/events/${config.guildId}/${targetEvent.id}`;
                 eventText = `[Rejoindre l'événement Discord](${eventUrl})`;
-                recurringEventData = recurringEvent; // Stocker pour utiliser la description
-                console.log('✅ Utilisation des informations de l\'événement récurrent trouvé');
+                
+                // Stocker pour utiliser la description (priorité à l'événement spécifique)
+                recurringEventData = targetEvent;
+                console.log('✅ Utilisation des informations de l\'événement trouvé');
             }
         }
         
         // Si aucun événement récurrent trouvé, utiliser les valeurs par défaut
         if (!recurringEvent) {
+            console.log('⚠️  Aucun événement récurrent trouvé');
             eventDate = formattedDate;
             eventTime = '20:30'; // Heure cohérente basée sur les autres événements
             eventLocation = '📍 [Le Cube en Bois](https://www.google.com/maps/place/Le+D%C3%A9mon+du+Jeu/@47.6239545,1.3247093,214m)';
