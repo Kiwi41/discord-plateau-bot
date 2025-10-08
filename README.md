@@ -65,7 +65,11 @@ Bot Discord intelligent qui crée et met à jour automatiquement des posts dans 
 ### 🎯 Installation en 15 minutes
 👉 **[Guide d'installation rapide](docs/guides/QUICK_INSTALL.md)** - Pour débutants complets
 
-### 📚 Documentation complète  
+### � Docker & NAS Synology
+Si vous voulez exécuter le bot sur votre propre infrastructure (NAS Synology, Raspberry Pi ou serveur), consultez :
+👉 **[Guide Docker / Synology](docs/DOCKER_SYNOLOGY.md)** — instructions pour builder, déployer et exécuter avec Container Manager ou docker-compose
+
+### �📚 Documentation complète  
 👉 **[Documentation détaillée](docs/README.md)** - Guide complet avec diagrammes
 
 ### 🗂️ Index de la documentation
