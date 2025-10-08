@@ -1,0 +1,40 @@
+digraph data_flow {
+    rankdir=LR;
+    node [shape=ellipse, style=filled];
+    
+    // Sources de données
+    node [fillcolor=lightblue];
+    discord_events [label="Événements\nDiscord"];
+    config_env [label="Variables\n.env"];
+    default_values [label="Valeurs\npar défaut"];
+    
+    // Traitement
+    node [fillcolor=lightyellow];
+    event_search [label="Recherche\nd'événement"];
+    data_extraction [label="Extraction\ndonnées"];
+    post_creation [label="Création\npost"];
+    
+    // Sorties
+    node [fillcolor=lightgreen];
+    forum_post [label="Post Forum\nDiscord"];
+    
+    // Données intermédiaires
+    node [fillcolor=lightcoral, shape=box];
+    event_info [label="Infos événement:\n• Date/Heure\n• Lieu\n• Description\n• Lien"];
+    embed_data [label="Données Embed:\n• Titre\n• Description\n• Champs\n• Couleur"];
+    
+    // Flux principal
+    discord_events -> event_search [label="API fetch"];
+    config_env -> event_search [label="IDs, URLs"];
+    
+    event_search -> data_extraction [label="Événement trouvé"];
+    default_values -> data_extraction [label="Si aucun événement", style=dashed];
+    
+    data_extraction -> event_info;
+    event_info -> post_creation;
+    post_creation -> embed_data;
+    embed_data -> forum_post;
+    
+    // Retour pour mise à jour
+    forum_post -> post_creation [label="Vérif. changements", style=dashed, color=red];
+}

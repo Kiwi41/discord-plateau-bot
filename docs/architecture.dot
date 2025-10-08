@@ -1,0 +1,58 @@
+digraph architecture {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+    
+    // Définir les styles
+    node [fillcolor=lightblue, style="rounded,filled"];
+    subgraph cluster_discord {
+        label="🎮 Discord";
+        style=filled;
+        fillcolor=lightgray;
+        
+        server [label="Serveur Discord\n'Le Démon du Jeu'"];
+        forum [label="Canal Forum\n'planning-plateau'"];
+        events [label="Événements Discord\n(récurrents/spécifiques)"];
+    }
+    
+    node [fillcolor=lightgreen];
+    subgraph cluster_heroku {
+        label="☁️ Heroku (Cloud)";
+        style=filled;
+        fillcolor=lightyellow;
+        
+        bot [label="Bot Discord\nNode.js"];
+        cron [label="Planificateur\n(node-cron)"];
+        vars [label="Variables\nd'environnement"];
+    }
+    
+    node [fillcolor=lightcoral];
+    subgraph cluster_functions {
+        label="🔧 Fonctions principales";
+        style=filled;
+        fillcolor=lightpink;
+        
+        fetch_events [label="fetchDiscordEventsWithRetry()\nRécupère événements"];
+        process_friday [label="processOneFriday()\nTraite un vendredi"];
+        create_post [label="createForumPost()\nCrée/met à jour posts"];
+        check_duplicates [label="checkForDuplicates()\nVérifie doublons"];
+    }
+    
+    // Connexions
+    cron -> bot [label="Chaque mardi 10h"];
+    bot -> fetch_events [label="1. Récupérer"];
+    fetch_events -> events [label="API Discord"];
+    events -> fetch_events [label="Liste événements"];
+    
+    fetch_events -> process_friday [label="2. Traiter"];
+    process_friday -> check_duplicates [label="3. Vérifier"];
+    check_duplicates -> forum [label="Recherche posts"];
+    forum -> check_duplicates [label="Posts existants"];
+    
+    check_duplicates -> create_post [label="4. Créer/MAJ"];
+    create_post -> forum [label="Nouveau post/MAJ"];
+    
+    vars -> bot [label="Configuration"];
+    
+    // Commandes manuelles
+    server -> bot [label="!create-plateau-post\n!process-next-month", style=dashed];
+}

@@ -1,0 +1,76 @@
+digraph deployment_process {
+    rankdir=TB;
+    bgcolor="white";
+    
+    // Styling
+    node [shape=box, style=filled, fontname="Arial", fontsize=10];
+    edge [fontname="Arial", fontsize=9];
+    
+    // Development phase
+    subgraph cluster_dev {
+        label="🖥️ Phase de développement";
+        style=filled;
+        fillcolor="#e3f2fd";
+        
+        code [label="📁 Code source\n(index.js, package.json)", fillcolor="#bbdefb"];
+        env [label="⚙️ Configuration\n(.env)", fillcolor="#bbdefb"];
+        test [label="🧪 Tests locaux\n(npm install, node index.js)", fillcolor="#bbdefb"];
+    }
+    
+    // Git phase  
+    subgraph cluster_git {
+        label="📦 Versioning Git";
+        style=filled;
+        fillcolor="#f3e5f5";
+        
+        commit [label="📝 Commits\n(git add, commit, push)", fillcolor="#e1bee7"];
+        repo [label="🗃️ Repository\n(GitHub/GitLab)", fillcolor="#e1bee7"];
+    }
+    
+    // Heroku phase
+    subgraph cluster_heroku {
+        label="☁️ Déploiement Heroku";
+        style=filled; 
+        fillcolor="#e8f5e8";
+        
+        create [label="🏗️ Création app\n(heroku create)", fillcolor="#c8e6c9"];
+        config [label="⚙️ Variables env\n(heroku config:set)", fillcolor="#c8e6c9"];
+        deploy [label="🚀 Déploiement\n(git push heroku)", fillcolor="#c8e6c9"];
+        start [label="▶️ Démarrage\n(heroku ps:scale)", fillcolor="#c8e6c9"];
+    }
+    
+    // Discord phase
+    subgraph cluster_discord {
+        label="🎮 Intégration Discord";
+        style=filled;
+        fillcolor="#fff3e0";
+        
+        bot_app [label="🤖 Application Bot\n(Discord Developer)", fillcolor="#ffcc02"];
+        permissions [label="🔐 Permissions\n(Send Messages, etc.)", fillcolor="#ffcc02"];
+        invite [label="📨 Invitation\n(sur le serveur)", fillcolor="#ffcc02"];
+    }
+    
+    // Production
+    live [label="✅ Bot en production\n24h/24, 7j/7", 
+          shape=ellipse, fillcolor="#4caf50", fontcolor="white", fontsize=12];
+    
+    // Flow
+    code -> env -> test;
+    test -> commit;
+    commit -> repo;
+    repo -> create;
+    create -> config;
+    config -> deploy;
+    deploy -> start;
+    
+    bot_app -> permissions -> invite;
+    
+    start -> live;
+    invite -> live;
+    
+    // Labels on edges
+    test -> commit [label="✅ Tests OK"];
+    repo -> create [label="🔗 Connection"];
+    start -> live [label="🎉 Succès"];
+    invite -> live [label="🤝 Connecté"];
+}

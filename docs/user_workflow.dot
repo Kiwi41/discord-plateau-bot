@@ -1,0 +1,87 @@
+digraph user_workflow {
+    rankdir=TB;
+    bgcolor="white";
+    
+    // Styling
+    node [shape=box, style=filled, fontname="Arial", fontsize=10];
+    edge [fontname="Arial", fontsize=9, color="#666666"];
+    
+    // User actions
+    subgraph cluster_user {
+        label="👤 Actions utilisateur";
+        style=filled;
+        fillcolor="#e8f4ff";
+        
+        create_event [label="📅 Créer événement\nDiscord (vendredi)", fillcolor="#b3d9ff"];
+        manual_cmd [label="⌨️ Commande manuelle\n(!create-plateau-post)", fillcolor="#b3d9ff"];
+        check_post [label="👀 Vérifier le post\ncréé dans le forum", fillcolor="#b3d9ff"];
+    }
+    
+    // Automatic processes
+    subgraph cluster_auto {
+        label="🤖 Processus automatiques";
+        style=filled;
+        fillcolor="#f0f8f0";
+        
+        schedule [label="⏰ Planificateur\n(samedi 3h00)", fillcolor="#c8e6c9"];
+        fetch_events [label="🔍 Recherche événements\n(mots-clés: plateau, soirée)", fillcolor="#c8e6c9"];
+        process_fridays [label="📋 Traitement\n4 prochains vendredis", fillcolor="#c8e6c9"];
+    }
+    
+    // Bot decisions
+    subgraph cluster_decision {
+        label="🧠 Logique du bot";
+        style=filled;
+        fillcolor="#fff8e1";
+        
+        event_found [label="❓ Événement trouvé\npour ce vendredi ?", 
+                    shape=diamond, fillcolor="#ffeb3b"];
+        post_exists [label="❓ Post déjà existant\ndans le forum ?", 
+                    shape=diamond, fillcolor="#ffeb3b"];
+        needs_update [label="❓ Infos différentes\n(heure, lieu, desc) ?", 
+                     shape=diamond, fillcolor="#ffeb3b"];
+    }
+    
+    // Bot actions
+    subgraph cluster_bot_actions {
+        label="⚡ Actions du bot";
+        style=filled;
+        fillcolor="#fce4ec";
+        
+        create_post [label="📝 Créer nouveau post\navec infos événement", fillcolor="#f8bbd9"];
+        update_post [label="🔄 Mettre à jour\npost existant", fillcolor="#f8bbd9"];
+        default_post [label="📝 Créer post\navec valeurs par défaut", fillcolor="#f8bbd9"];
+        no_action [label="✅ Rien à faire\npost déjà à jour", fillcolor="#f8bbd9"];
+    }
+    
+    // Results
+    forum_post [label="🎯 Post dans le forum\navec toutes les infos", 
+               shape=ellipse, fillcolor="#4caf50", fontcolor="white"];
+    
+    // Automatic flow
+    schedule -> fetch_events -> process_fridays -> event_found;
+    
+    // Manual flow
+    create_event -> manual_cmd -> event_found;
+    
+    // Decision flow
+    event_found -> post_exists [label="✅ Oui"];
+    event_found -> default_post [label="❌ Non"];
+    
+    post_exists -> needs_update [label="✅ Oui"];
+    post_exists -> create_post [label="❌ Non"];
+    
+    needs_update -> update_post [label="✅ Oui"];
+    needs_update -> no_action [label="❌ Non"];
+    
+    // Final results
+    create_post -> forum_post;
+    update_post -> forum_post;
+    default_post -> forum_post;
+    no_action -> check_post;
+    
+    forum_post -> check_post [label="🔔 Notification"];
+    
+    // Feedback loop
+    check_post -> create_event [label="📅 Préparer\nprochain vendredi", style=dashed];
+}
