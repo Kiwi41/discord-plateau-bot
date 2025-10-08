@@ -29,7 +29,7 @@ Ce bot Discord a été créé pour **automatiser la gestion des soirées plateau
 
 ### Fonctionnalités principales
 
-✅ **Création automatique de posts** chaque mardi à 10h  
+✅ **Création automatique de posts** chaque samedi à 3h  
 ✅ **Récupération d'informations** depuis les événements Discord  
 ✅ **Gestion intelligente des doublons** (pas de posts multiples)  
 ✅ **Mise à jour automatique** si les infos changent  
@@ -38,7 +38,7 @@ Ce bot Discord a été créé pour **automatiser la gestion des soirées plateau
 
 ### Ce que fait le bot concrètement
 
-1. **Chaque mardi à 10h** → Crée des posts pour les 4 prochains vendredis
+1. **Chaque samedi à 3h** → Crée des posts pour les 4 prochains vendredis
 2. **Récupère les infos** → Heure, lieu, description depuis Discord
 3. **Poste dans le forum** → Message avec toutes les infos importantes
 4. **Met à jour** → Si tu changes l'événement, le post se met à jour
@@ -50,7 +50,7 @@ Ce bot Discord a été créé pour **automatiser la gestion des soirées plateau
 ### Le cycle de vie du bot
 
 ```
-🕙 Mardi 10h00
+� Samedi 3h00
     ↓
 🔍 Recherche événements Discord
     ↓
@@ -60,7 +60,7 @@ Ce bot Discord a été créé pour **automatiser la gestion des soirées plateau
     ↓
 ✅ Marque comme traités
     ↓
-😴 Attend le prochain mardi
+😴 Attend le prochain samedi
 ```
 
 ### Architecture du système
@@ -83,7 +83,7 @@ Ce bot Discord a été créé pour **automatiser la gestion des soirées plateau
 │  ┌─────────────────────────────────────┐│
 │  │     📋 Processus Principal         ││
 │  │                                    ││
-│  │  • Cron: Mardi 10h                ││
+│  │  • Cron: Samedi 3h                ││
 │  │  • Fetch événements Discord       ││
 │  │  • Traite 4 prochains vendredis   ││
 │  │  • Crée posts forum               ││
@@ -143,7 +143,7 @@ Ce bot Discord a été créé pour **automatiser la gestion des soirées plateau
     ▼
 📅 Événement Discord
     │
-    │ 2. Bot détecte automatiquement (mardi 10h)
+    │ 2. Bot détecte automatiquement (samedi 3h)
     ▼
 🤖 Bot Processing
     │
@@ -281,7 +281,7 @@ heroku ps:scale worker=1
 ### Fonctionnement automatique
 
 Le bot fonctionne **automatiquement** :
-- **Chaque mardi à 10h** (fuseau configuré)
+- **Chaque samedi à 3h** (fuseau configuré)
 - Cherche les événements "Soirée Plateau" des 4 prochains vendredis
 - Crée des posts dans le forum avec toutes les infos
 
@@ -419,7 +419,7 @@ heroku ps:type
 ### Surveillance recommandée
 
 #### Contrôles hebdomadaires
-- [ ] **Posts créés** : Vérifier que les posts apparaissent chaque mardi
+- [ ] **Posts créés** : Vérifier que les posts apparaissent chaque samedi
 - [ ] **Contenu posts** : Infos cohérentes avec événements Discord
 - [ ] **Logs** : Pas d'erreurs récurrentes
 
@@ -503,7 +503,7 @@ heroku ps:restart worker
 
 **Points clés :**
 - Authentification Discord via token bot
-- Récurrence cron : `0 10 * * 2` (mardi 10h)  
+- Récurrence cron : `0 3 * * 6` (samedi 3h)  
 - Anti-doublon via nom + date dans titre post
 - Retry logic avec backoff exponentiel
 - Support multi-timezone via process.env.TZ

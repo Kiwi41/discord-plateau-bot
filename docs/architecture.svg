@@ -107,7 +107,7 @@
 <title>cron&#45;&gt;bot</title>
 <path fill="none" stroke="black" d="M547.38,-502.97C530.41,-490.03 507.35,-472.43 488.77,-458.25"/>
 <polygon fill="black" stroke="black" points="490.66,-455.29 480.59,-452 486.42,-460.85 490.66,-455.29"/>
-<text text-anchor="middle" x="586.5" y="-473.8" font-family="Times,serif" font-size="14.00">Chaque mardi 10h</text>
+<text text-anchor="middle" x="586.5" y="-473.8" font-family="Times,serif" font-size="14.00">Chaque samedi 3h</text>
 </g>
 <!-- vars -->
 <g id="node6" class="node">

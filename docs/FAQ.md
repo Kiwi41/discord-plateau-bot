@@ -80,7 +80,7 @@ const keywords = ['plateau', 'soirée', 'jeu', 'board', 'game', 'nouveau_mot'];
 cron.schedule('0 3 * * 6', () => {
 
 // Exemples d'autres planifications :
-cron.schedule('0 10 * * 2', () => { // Mardi 10h00
+cron.schedule('0 10 * * 2', () => { // Mardi 10h00 (exemple de changement)
 cron.schedule('0 18 * * 5', () => { // Vendredi 18h00
 ```
 

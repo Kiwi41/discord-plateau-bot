@@ -3,7 +3,7 @@
 Ce projet contient un bot Discord qui crée automatiquement des posts dans un forum pour planifier les soirées plateaux du vendredi soir.
 
 ## Fonctionnalités
-- Création automatique de posts hebdomadaires chaque mardi à 10h
+- Création automatique de posts hebdomadaires chaque samedi à 3h
 - Intégration avec les forums Discord  
 - Planification des événements récurrents avec node-cron
 - Messages avec embeds Discord élégants

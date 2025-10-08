@@ -38,7 +38,7 @@ digraph architecture {
     }
     
     // Connexions
-    cron -> bot [label="Chaque mardi 10h"];
+    cron -> bot [label="Chaque samedi 3h"];
     bot -> fetch_events [label="1. Récupérer"];
     fetch_events -> events [label="API Discord"];
     events -> fetch_events [label="Liste événements"];
