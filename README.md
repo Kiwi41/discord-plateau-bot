@@ -63,16 +63,19 @@ Bot Discord intelligent qui crée et met à jour automatiquement des posts dans 
 ## 📋 Démarrage rapide
 
 ### 🎯 Installation en 15 minutes
-👉 **[Guide d'installation rapide](docs/QUICK_INSTALL.md)** - Pour débutants complets
+👉 **[Guide d'installation rapide](docs/guides/QUICK_INSTALL.md)** - Pour débutants complets
 
 ### 📚 Documentation complète  
 👉 **[Documentation détaillée](docs/README.md)** - Guide complet avec diagrammes
 
 ### 🗂️ Index de la documentation
-👉 **[Index général](docs/INDEX.md)** - Navigation dans toute la documentation
+👉 **[Index général](docs/guides/INDEX.md)** - Navigation dans toute la documentation
 
 ### ❓ Problèmes ?
-👉 **[FAQ](docs/FAQ.md)** - Réponses aux questions fréquentes
+👉 **[FAQ](docs/guides/FAQ.md)** - Réponses aux questions fréquentes
+
+### 📁 Structure du projet
+👉 **[Arborescence organisée](PROJECT_STRUCTURE.md)** - Organisation des fichiers et scripts
 
 ---
 
@@ -80,9 +83,10 @@ Bot Discord intelligent qui crée et met à jour automatiquement des posts dans 
 
 <div align="center">
 
-| [![🚀 Installation rapide](https://img.shields.io/badge/🚀_Installation-15_min-brightgreen?style=for-the-badge)](docs/QUICK_INSTALL.md) | [![📚 Documentation](https://img.shields.io/badge/📚_Documentation-Complète-blue?style=for-the-badge)](docs/README.md) |
+| [![🚀 Installation rapide](https://img.shields.io/badge/🚀_Installation-15_min-brightgreen?style=for-the-badge)](docs/guides/QUICK_INSTALL.md) | [![📚 Documentation](https://img.shields.io/badge/📚_Documentation-Complète-blue?style=for-the-badge)](docs/README.md) |
 |:---:|:---:|
-| [![❓ FAQ](https://img.shields.io/badge/❓_FAQ-Support-orange?style=for-the-badge)](docs/FAQ.md) | [![🗂️ Index](https://img.shields.io/badge/🗂️_Index-Navigation-purple?style=for-the-badge)](docs/INDEX.md) |
+| [![❓ FAQ](https://img.shields.io/badge/❓_FAQ-Support-orange?style=for-the-badge)](docs/guides/FAQ.md) | [![🗂️ Index](https://img.shields.io/badge/🗂️_Index-Navigation-purple?style=for-the-badge)](docs/guides/INDEX.md) |
+| [![📁 Structure](https://img.shields.io/badge/📁_Structure-Projet-gray?style=for-the-badge)](PROJECT_STRUCTURE.md) | [![🔧 Scripts](https://img.shields.io/badge/🔧_Scripts-Automatisation-cyan?style=for-the-badge)](scripts/) |
 
 </div>
 
@@ -94,31 +98,31 @@ Bot Discord intelligent qui crée et met à jour automatiquement des posts dans 
 <tr>
 <td align="center" width="20%">
 <a href="docs/README.md">
-<img src="docs/inline_svg/architecture.svg" width="120" alt="Architecture"/>
+<img src="docs/assets/diagrams/architecture.svg" width="120" alt="Architecture"/>
 <br><sub><b>🏗️ Architecture</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
 <a href="docs/README.md#processus-de-déploiement">
-<img src="docs/inline_svg/deployment.svg" width="120" alt="Déploiement"/>
+<img src="docs/assets/diagrams/deployment.svg" width="120" alt="Déploiement"/>
 <br><sub><b>🚀 Déploiement</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
 <a href="docs/README.md#flux-des-données">
-<img src="docs/inline_svg/data_flow.svg" width="120" alt="Flux de données"/>
+<img src="docs/assets/diagrams/data_flow.svg" width="120" alt="Flux de données"/>
 <br><sub><b>📊 Flux de données</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
-<a href="docs/FAQ.md">
-<img src="docs/inline_svg/user_workflow.svg" width="120" alt="Workflow utilisateur"/>
+<a href="docs/guides/FAQ.md">
+<img src="docs/assets/diagrams/user_workflow.svg" width="120" alt="Workflow utilisateur"/>
 <br><sub><b>🎮 Workflow</b></sub>
 </a>
 </td>
 <td align="center" width="20%">
-<a href="docs/FAQ.md#--comment-fonctionne-le-cycle-de-vie-du-bot-">
-<img src="docs/inline_svg/bot_lifecycle.svg" width="120" alt="Cycle de vie"/>
+<a href="docs/guides/FAQ.md#--comment-fonctionne-le-cycle-de-vie-du-bot-">
+<img src="docs/assets/diagrams/bot_lifecycle.svg" width="120" alt="Cycle de vie"/>
 <br><sub><b>🔄 Cycle de vie</b></sub>
 </a>
 </td>
@@ -245,7 +249,8 @@ Bot Discord intelligent qui crée et met à jour automatiquement des posts dans 
 
 - **Issues** : [Créer un ticket](https://github.com/Kiwi41/discord-plateau-bot/issues)
 - **Documentation** : [Guide complet](docs/README.md)
-- **FAQ** : [Questions fréquentes](docs/FAQ.md)
+- **FAQ** : [Questions fréquentes](docs/guides/FAQ.md)
+- **Structure** : [Organisation du projet](PROJECT_STRUCTURE.md)
 
 ## 📄 Licence et crédits
 
@@ -255,6 +260,6 @@ Projet open-source développé pour automatiser la gestion des soirées plateaux
 
 <div align="center">
 
-**[🚀 Commencer maintenant](docs/QUICK_INSTALL.md)** • **[📚 Documentation](docs/README.md)** • **[❓ Support](docs/FAQ.md)**
+**[🚀 Commencer maintenant](docs/guides/QUICK_INSTALL.md)** • **[📚 Documentation](docs/README.md)** • **[❓ Support](docs/guides/FAQ.md)**
 
 </div>
