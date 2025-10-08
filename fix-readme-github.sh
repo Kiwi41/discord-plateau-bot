@@ -1,3 +1,10 @@
+#!/bin/bash
+
+echo "🔄 Remplacement des diagrammes SVG par des descriptions textuelles GitHub-friendly"
+echo
+
+# Créer un nouveau README sans les SVG problématiques
+cat > "/home/a154355/git/perso/Discord/docs/README.md" << 'EOF'
 # 🎲 Bot Discord pour Soirées Plateaux - Documentation Complète
 
 ## 📋 Table des matières
@@ -508,3 +515,7 @@ heroku ps:restart worker
 - Retry logic avec backoff exponentiel
 - Support multi-timezone via process.env.TZ
 
+EOF
+
+echo "✅ README mis à jour sans SVG problématiques"
+echo "🔄 Les diagrammes sont maintenant en ASCII art GitHub-friendly"
