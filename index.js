@@ -187,15 +187,21 @@ async function updateExistingPost(thread, embed, eventInfo) {
         // Extraction des anciennes valeurs
         const oldTime = currentFields.find(f => f.name === '🕖 Heure')?.value || '';
         const oldLocation = currentFields.find(f => f.name === '📍 Lieu')?.value || '';
+        const oldEventText = currentFields.find(f => f.name === '🎯 Événement Discord')?.value || '';
+        const oldDescription = currentEmbed.description || '';
         
         // Comparaison avec les nouvelles valeurs
         const hasTimeChanged = oldTime !== eventInfo.time;
         const hasLocationChanged = oldLocation !== eventInfo.location;
+        const hasEventTextChanged = oldEventText !== eventInfo.eventText;
+        const hasDescriptionChanged = oldDescription !== eventInfo.description;
         
-        if (hasTimeChanged || hasLocationChanged) {
+        if (hasTimeChanged || hasLocationChanged || hasEventTextChanged || hasDescriptionChanged) {
             console.log('🔄 Mise à jour détectée:');
             if (hasTimeChanged) console.log(`   🕖 Heure: "${oldTime}" → "${eventInfo.time}"`);
             if (hasLocationChanged) console.log(`   📍 Lieu: "${oldLocation}" → "${eventInfo.location}"`);
+            if (hasEventTextChanged) console.log(`   🎯 Événement: "${oldEventText}" → "${eventInfo.eventText}"`);
+            if (hasDescriptionChanged) console.log(`   📝 Description: changée (${oldDescription.length} → ${eventInfo.description.length} caractères)`);
             
             await firstMessage.edit({ embeds: [embed] });
             return true;
@@ -503,7 +509,9 @@ Venez découvrir et jouer à une grande variété de jeux de plateau dans une am
     const eventInfo = {
         date: eventDate,
         time: eventTime,
-        location: eventLocation
+        location: eventLocation,
+        eventText: eventText,
+        description: embedDescription
     };
     
     if (existingPost) {
