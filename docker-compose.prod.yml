@@ -1,6 +1,6 @@
 services:
   plateau-bot:
-    build: .
+    image: ghcr.io/kiwi41/discord-plateau-bot:latest
     restart: unless-stopped
     env_file:
       - .env
