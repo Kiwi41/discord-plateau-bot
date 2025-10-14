@@ -1,1 +1,0 @@
-guides/QUICK_INSTALL.md

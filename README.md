@@ -1,13 +1,239 @@
-# 🎲 Bot Discord - Soirées Plateaux
+# 🎲 Discord Bot pour Soirées Plateaux
 
-Bot Discord intelligent qui crée et met à jour automatiquement des posts dans un forum pour planifier les soirées plateaux du vendredi soir.
+Bot Discord automatisé qui crée des posts hebdomadaires dans un forum pour planifier les soirées jeux de plateau du vendredi soir.
 
-<div align="center">
+## ✨ Fonctionnalités
 
-<a href="docs/README.md">
-<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+- **📅 Création automatique** : Posts hebdomadaires chaque samedi à 3h00
+- **🎯 Intégration forum** : Utilise les forums Discord natifs
+- **🔗 Liens automatiques** : Vers les événements Discord et inscription
+- **⚡ Commandes manuelles** : Création manuelle et gestion avancée
+- **🐳 Docker** : Déploiement conteneurisé sur NAS, cloud ou local
+- **🔄 CI/CD** : Pipeline automatisé avec GitHub Actions
+
+## 🚀 Installation Rapide
+
+### Option 1: Image Pré-construite (Recommandé)
+
+```bash
+# Télécharger la configuration
+wget https://raw.githubusercontent.com/Kiwi41/discord-plateau-bot/main/docker-compose.prod.yml
+wget https://raw.githubusercontent.com/Kiwi41/discord-plateau-bot/main/.env.example
+
+# Configurer l'environnement  
+cp .env.example .env
+# Éditer .env avec vos tokens Discord
+
+# Lancer avec l'image GitHub
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Option 2: Build Local
+
+```bash
+# Cloner le projet
+git clone https://github.com/Kiwi41/discord-plateau-bot.git
+cd discord-plateau-bot
+
+# Configurer l'environnement
+cp .env.example .env
+# Éditer .env avec vos tokens Discord
+
+# Build et lancer
+docker compose up -d
+```
+
+### Option 2: Node.js local
+
+```bash
+# Installer les dépendances
+npm install
+
+# Configurer l'environnement
+cp .env.example .env
+# Éditer .env avec vos tokens Discord
+
+# Démarrer le bot
+npm start
+```
+
+## ⚙️ Configuration
+
+### 🔐 Configuration Sécurisée
+
+#### Option 1: Variables GitHub (Recommandé)
+
+```bash
+# Charger les variables depuis GitHub
+./load-github-vars.sh
+```
+
+Voir [GITHUB_VARIABLES.md](GITHUB_VARIABLES.md) pour la configuration complète.
+
+#### Option 2: Configuration Interactive
+
+```bash
+# Script de configuration automatisé
+./setup-config.sh
+```
+
+#### Option 3: Variables d'Environnement
+
+```bash
+# Dans votre ~/.zshrc ou ~/.bashrc
+export DISCORD_TOKEN="votre_token_bot"
+export GUILD_ID="votre_guild_id" 
+export FORUM_CHANNEL_ID="votre_forum_channel_id"
+export REGISTRATION_URL="https://votre-lien-inscription.com"
+export TIMEZONE="Europe/Paris"
+```
+
+**⚠️ Important** : Ne jamais commiter de vrais tokens ! Voir [SECURITY.md](SECURITY.md) pour les détails.
+
+### 🔑 Obtenir les tokens Discord
+
+1. **Token Bot** : [Discord Developer Portal](https://discord.com/developers/applications)
+   - Créer une application → Bot → Copy Token
+   
+2. **Guild ID** : Clic droit sur votre serveur → "Copier l'identifiant"
+
+3. **Forum Channel ID** : Clic droit sur votre canal forum → "Copier l'identifiant"
+
+## 🐳 Déploiement Docker
+
+### NAS Synology
+
+1. **Container Manager** : Installer depuis le Package Center
+2. **Projet** : Télécharger et extraire le code
+3. **Configuration** : 
+   ```bash
+   # Dans le dossier du projet
+   docker compose up -d
+   ```
+4. **Supervision** : Le conteneur redémarre automatiquement
+
+
+
+## 📋 Commandes Disponibles
+
+- `!create-plateau-post` : Crée un post pour le prochain vendredi
+- `!process-next-month` : Crée les 4 prochains vendredis
+- `!plateau-help` : Affiche l'aide complète
+
+## 🛠️ Développement
+
+### Structure du Projet
+
+```
+discord-plateau-bot/
+├── 📄 index.js              # Bot principal
+├── 📄 package.json          # Dépendances Node.js
+├── 🐳 Dockerfile           # Image Docker
+├── 🐳 docker-compose.yml   # Orchestration
+├── ⚙️ .env.example         # Template configuration
+├── 🔧 .github/workflows/   # CI/CD GitHub Actions
+└── 📚 README.md            # Documentation
+```
+
+### Technologies
+
+- **Node.js** 18+ avec discord.js v14
+- **Cron** : node-cron pour planification
+- **Docker** : Conteneurisation multi-plateforme
+- **GitHub Actions** : CI/CD automatisé
+
+### Développer localement
+
+```bash
+# Installation
+npm install
+
+# Tests
+npm run test
+
+# Développement avec auto-restart
+npm run dev
+```
+
+## 📊 Monitoring
+
+Le bot affiche au démarrage :
+- Connexion Discord réussie
+- Nombre de serveurs et utilisateurs
+- Planification active (samedis 3h00)
+- Commandes disponibles
+
+```
+🤖 Bot connecté en tant que Bot Soirées Plateaux#2860!
+📊 Serveurs: 1
+👥 Utilisateurs: 42
+🕒 Planification active: Samedis à 3h00 (Europe/Paris)
+```
+
+## 🔧 Dépannage
+
+### Erreurs courantes
+
+**Bot ne se connecte pas**
+```bash
+# Vérifier le token
+echo $DISCORD_TOKEN
+
+# Vérifier les permissions bot sur Discord
+# Scope: bot + applications.commands
+# Permissions: Send Messages, Use Slash Commands, Create Public Threads
+```
+
+**Posts non créés**
+```bash
+# Vérifier les IDs
+echo $GUILD_ID $FORUM_CHANNEL_ID
+
+# Tester manuellement
+!create-plateau-post
+```
+
+**Docker ne démarre pas**
+```bash
+# Logs du conteneur
+docker compose logs plateau-bot
+
+# Reconstruction
+docker compose build --no-cache
+```
+
+## 💰 Coûts et Alternatives
+
+| Solution | Coût | Avantages |
+|----------|------|-----------|
+| **NAS Synology** | ~2€/mois* | Contrôle total, privé, auto-hébergement |
+| **Heroku** | 7$/mois | Stable, mature, support professionnel |
+
+*Électricité du NAS à considérer
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
+3. Commit (`git commit -m 'Ajout nouvelle fonctionnalité'`)
+4. Push (`git push origin feature/nouvelle-fonctionnalite`)
+5. Créer une Pull Request
+
+## 📄 Licence
+
+MIT License - Voir [LICENSE](LICENSE) pour plus de détails.
+
+## 🎯 Roadmap
+
+- [ ] Interface web de configuration
+- [ ] Support multi-serveurs Discord
+- [ ] Statistiques et métriques
+- [ ] Notifications Slack/Email
+- [ ] API REST pour intégrations
+
+---
+
+**⭐ N'oubliez pas de mettre une étoile au projet si vous l'utilisez !** 
             refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
     </marker>
