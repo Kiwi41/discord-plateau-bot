@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  discord-bot-python:
+    image: ghcr.io/${{ github.repository_owner }}/discord-python:latest
+    container_name: discord-plateau-bot-python
+    restart: unless-stopped
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - GUILD_ID=${GUILD_ID}
+      - FORUM_CHANNEL_ID=${FORUM_CHANNEL_ID}
+      - REGISTRATION_URL=${REGISTRATION_URL:-https://votre-lien-inscription.com}
+      - EVENT_ID=${EVENT_ID}
+      - TIMEZONE=${TIMEZONE:-Europe/Paris}
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
