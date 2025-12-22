@@ -24,9 +24,9 @@ fi
 if [ ! -f .env ]; then
     echo "⚠️  Fichier .env introuvable"
     
-    if [ -f .env.example.python ]; then
-        echo "📝 Copie de .env.example.python vers .env..."
-        cp .env.example.python .env
+    if [ -f .env.example ]; then
+        echo "📝 Copie de .env.example vers .env..."
+        cp .env.example .env
         echo "✅ Fichier .env créé"
         echo ""
         echo "⚠️  IMPORTANT: Éditez le fichier .env avec vos vraies valeurs:"
@@ -36,7 +36,7 @@ if [ ! -f .env ]; then
         echo ""
         read -p "Appuyez sur Entrée après avoir configuré .env..."
     else
-        echo "❌ .env.example.python introuvable"
+        echo "❌ .env.example introuvable"
         exit 1
     fi
 fi
@@ -44,23 +44,23 @@ fi
 # Demander le mode de déploiement
 echo ""
 echo "Mode de déploiement:"
-echo "  1) Build local (docker-compose.python.yml)"
-echo "  2) Image pré-construite (docker-compose.prod.python.yml)"
+echo "  1) Build local (docker-compose.yml)"
+echo "  2) Image pré-construite (docker-compose.prod.yml)"
 echo ""
 read -p "Choisissez (1 ou 2): " mode
 
 case $mode in
     1)
-        COMPOSE_FILE="docker-compose.python.yml"
+        COMPOSE_FILE="docker-compose.yml"
         echo "📦 Build de l'image Docker..."
         docker compose -f $COMPOSE_FILE build
         ;;
     2)
-        COMPOSE_FILE="docker-compose.prod.python.yml"
+        COMPOSE_FILE="docker-compose.prod.yml"
         echo "📥 Pull de l'image depuis le registre..."
         docker compose -f $COMPOSE_FILE pull || {
             echo "⚠️  Impossible de pull l'image, utilisation du build local..."
-            COMPOSE_FILE="docker-compose.python.yml"
+            COMPOSE_FILE="docker-compose.yml"
             docker compose -f $COMPOSE_FILE build
         }
         ;;

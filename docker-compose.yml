@@ -1,17 +1,25 @@
+version: '3.8'
+
 services:
-  plateau-bot:
-    build: .
+  discord-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discord-plateau-bot
     restart: unless-stopped
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - GUILD_ID=${GUILD_ID}
+      - FORUM_CHANNEL_ID=${FORUM_CHANNEL_ID}
+      - REGISTRATION_URL=${REGISTRATION_URL}
+      - EVENT_ID=${EVENT_ID}
+      - TIMEZONE=${TIMEZONE:-Europe/Paris}
     env_file:
       - .env
-    # volumes:
-      # Optionnel: montez un volume si vous voulez stocker des logs ou config persistante
-      # - ./data:/usr/src/app/data
-    # Pas de ports exposés par défaut : le bot ne propose pas d'API HTTP
-    # ports:
-    #   - "3000:3000"
+    volumes:
+      - ./bot.py:/app/bot.py:ro
     logging:
-      driver: json-file
+      driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
