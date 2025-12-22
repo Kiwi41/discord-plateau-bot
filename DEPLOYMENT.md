@@ -14,7 +14,74 @@ Ce guide détaille le déploiement du bot en container Docker sur votre NAS Syno
 
 ---
 
-### Méthode 1: Interface Web Container Manager (Recommandé)
+## 🚀 Méthode Rapide : Utiliser l'Image Pré-compilée (Recommandé)
+
+Cette méthode utilise l'image Docker pré-compilée depuis GitHub Container Registry. **Pas besoin de compiler l'image localement !**
+
+### Via Container Manager (Interface Web)
+
+1. **Préparer le dossier** :
+   - Créer `/docker/discord-plateau-bot/` dans File Station
+   - Télécharger [docker-compose.prod.yml](https://raw.githubusercontent.com/Kiwi41/discord-plateau-bot/master/docker-compose.prod.yml)
+   - Uploader le fichier dans le dossier créé
+
+2. **Créer le fichier .env** :
+   - Dans File Station, créer un fichier `.env`
+   - Ajouter vos identifiants Discord :
+   ```bash
+   DISCORD_TOKEN=votre_token_bot
+   GUILD_ID=votre_guild_id
+   FORUM_CHANNEL_ID=votre_forum_channel_id
+   REGISTRATION_URL=votre_lien_inscription
+   TIMEZONE=Europe/Paris
+   ```
+
+3. **Déployer** :
+   - Container Manager → **Project** → **Create**
+   - Nom : `discord-plateau-bot`
+   - Chemin : `/docker/discord-plateau-bot`
+   - Source : **docker-compose.prod.yml**
+   - Build → Le NAS télécharge l'image depuis GitHub et démarre
+
+### Via SSH (Plus Rapide)
+
+```bash
+# Connexion au NAS
+ssh admin@ip-de-votre-nas
+
+# Créer le dossier
+sudo mkdir -p /volume1/docker/discord-plateau-bot
+cd /volume1/docker/discord-plateau-bot
+
+# Télécharger docker-compose.prod.yml
+sudo curl -O https://raw.githubusercontent.com/Kiwi41/discord-plateau-bot/master/docker-compose.prod.yml
+
+# Créer le fichier .env avec vos secrets
+sudo nano .env
+
+# Pull de l'image depuis GitHub Container Registry
+sudo docker compose -f docker-compose.prod.yml pull
+
+# Démarrer le bot
+sudo docker compose -f docker-compose.prod.yml up -d
+
+# Vérifier les logs
+sudo docker compose -f docker-compose.prod.yml logs -f discord-bot
+```
+
+**Avantages** :
+- ✅ Pas de compilation locale (gain de temps)
+- ✅ Image testée et validée par GitHub Actions
+- ✅ Support multi-architecture (x86_64 et ARM64)
+- ✅ Mises à jour rapides avec `docker compose pull`
+
+---
+
+## 🔨 Méthode Alternative : Compiler l'Image Localement
+
+Si vous préférez compiler l'image vous-même sur le NAS :
+
+### Méthode 1: Interface Web Container Manager
 
 1. **Container Manager** :
    ```
@@ -57,7 +124,7 @@ Ce guide détaille le déploiement du bot en container Docker sur votre NAS Syno
 
 ---
 
-### Méthode 2: Déploiement via SSH (Avancé)
+### Méthode 2: Déploiement via SSH (Compilation Locale)
 
 ```bash
 # Connexion SSH au NAS
@@ -74,11 +141,52 @@ cd discord-plateau-bot
 sudo cp .env.example .env
 sudo nano .env  # Éditer avec vos tokens Discord
 
-# Démarrage du container
-sudo docker compose up -d
+# Build et démarrage du container
+sudo docker compose up -d --build
 
 # Vérification des logs
 sudo docker compose logs -f discord-bot
+```
+
+---
+
+## 🔄 Mise à Jour du Bot
+
+### Si vous utilisez l'image pré-compilée (docker-compose.prod.yml)
+
+```bash
+# Via SSH
+cd /volume1/docker/discord-plateau-bot
+
+# Télécharger la dernière image
+sudo docker compose -f docker-compose.prod.yml pull
+
+# Redémarrer avec la nouvelle version
+sudo docker compose -f docker-compose.prod.yml up -d
+
+# Vérifier les logs
+sudo docker compose -f docker-compose.prod.yml logs --tail=50 discord-bot
+```
+
+**Via Container Manager** :
+1. Project → discord-plateau-bot → **Action** → **Build**
+2. Le container se met à jour automatiquement
+
+### Si vous compilez localement (docker-compose.yml)
+
+```bash
+# Se connecter au NAS
+ssh admin@ip-de-votre-nas
+cd /volume1/docker/discord-plateau-bot
+
+# Télécharger les mises à jour
+sudo git pull origin master
+
+# Reconstruire et redémarrer
+sudo docker compose up -d --build
+
+# Vérifier le bon fonctionnement
+sudo docker compose logs --tail=50 discord-bot
 ```
 
 ---
@@ -96,7 +204,7 @@ sudo docker compose logs -f discord-bot
 # Voir les logs
 sudo docker compose logs discord-bot
 
-# Logs en temps réel
+# Logs en temps réel  
 sudo docker compose logs -f discord-bot
 
 # Redémarrer le bot
@@ -107,34 +215,9 @@ sudo docker compose down
 
 # Démarrer le bot
 sudo docker compose up -d
-```
 
----
-
-## 🔄 Mise à Jour du Bot
-
-### Via Interface Web
-
-1. **Télécharger la nouvelle version** depuis GitHub
-2. **Remplacer les fichiers** dans File Station (sauf `.env`)
-3. **Container Manager** → Project → discord-bot → **Build**
-4. Le container redémarre automatiquement avec la nouvelle version
-
-### Via SSH
-
-```bash
-# Se connecter au NAS
-ssh admin@ip-de-votre-nas
-cd /volume1/docker/discord-plateau-bot
-
-# Télécharger les mises à jour
-sudo git pull origin master
-
-# Reconstruire et redémarrer
-sudo docker compose up -d --build
-
-# Vérifier le bon fonctionnement
-sudo docker compose logs --tail=50 discord-bot
+# Pour l'image pré-compilée, ajouter -f docker-compose.prod.yml
+sudo docker compose -f docker-compose.prod.yml logs discord-bot
 ```
 
 ---
@@ -247,23 +330,24 @@ sudo tar -czf discord-bot-backup-$(date +%Y%m%d).tar.gz \
 
 ## 💡 Utilisation Avancée
 
-### Utiliser l'image Docker depuis GitHub Container Registry
+### Commandes Docker Utiles
 
-Au lieu de compiler l'image localement, vous pouvez utiliser l'image pré-compilée :
+```bash
+# Pull de la dernière image depuis GitHub Container Registry
+sudo docker pull ghcr.io/kiwi41/discord-plateau-bot:latest
 
-1. **Modifier docker-compose.yml** :
-   ```yaml
-   services:
-     discord-bot:
-       image: ghcr.io/kiwi41/discord-plateau-bot:latest
-       # Remplacer "build: ." par l'image ci-dessus
-   ```
+# Voir les images disponibles
+sudo docker images | grep discord-plateau-bot
 
-2. **Télécharger et démarrer** :
-   ```bash
-   sudo docker compose pull
-   sudo docker compose up -d
-   ```
+# Status du container
+sudo docker compose ps
+
+# Utilisation des ressources
+sudo docker stats discord-bot
+
+# Nettoyer les anciennes images
+sudo docker image prune -a -f
+```
 
 ### Variables d'Environnement Complètes
 
