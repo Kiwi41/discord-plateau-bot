@@ -1,24 +1,20 @@
-# 🚀 Guide de Déploiement - Discord Bot Soirées Plateaux
+# 🚀 Guide de Déploiement - Discord Bot Soirées Plateaux sur Synology
 
-Ce guide détaille le déploiement du bot sur différentes plateformes.
-
-## 🎯 Résumé des Options
-
-| Plateforme | Coût | Difficulté | Recommandé pour |
-|------------|------|------------|-----------------|
-| **NAS Synology** | ~2€/mois élec. | ⭐⭐⭐ Moyen | Auto-hébergement, contrôle total |
-| **Heroku** | 7$/mois | ⭐⭐ Facile | Production stable, simplicité |
+Ce guide détaille le déploiement du bot en container Docker sur votre NAS Synology.
 
 ---
 
-## 🏠 NAS Synology (Auto-hébergement)
+## 🏠 Déploiement sur NAS Synology
 
 ### Prérequis
 - NAS Synology avec DSM 7.0+
 - Package "Container Manager" installé
-- Accès SSH (optionnel)
+- Connexion internet stable
+- Accès SSH (optionnel, pour méthode avancée)
 
-### Méthode 1: Interface Web
+---
+
+### Méthode 1: Interface Web Container Manager (Recommandé)
 
 1. **Container Manager** :
    ```
@@ -27,14 +23,18 @@ Ce guide détaille le déploiement du bot sur différentes plateformes.
 
 2. **Télécharger le projet** :
    ```bash
-   # Sur votre PC
-   git clone https://github.com/votre-username/discord-plateau-bot.git
+   # Sur votre PC local
+   git clone https://github.com/Kiwi41/discord-plateau-bot.git
+   
    # Uploader le dossier sur le NAS via File Station
+   # Recommandé: /volume1/docker/discord-plateau-bot
    ```
 
-3. **Configuration** :
+3. **Configuration des variables d'environnement** :
+   - Dans File Station, naviguer vers le dossier du bot
+   - Créer un fichier `.env` (copier depuis `.env.example`)
+   - Éditer le fichier avec vos identifiants Discord :
    ```bash
-   # Dans File Station, créer .env dans le dossier du bot
    DISCORD_TOKEN=votre_token_bot
    GUILD_ID=votre_guild_id
    FORUM_CHANNEL_ID=votre_forum_channel_id
@@ -42,132 +42,159 @@ Ce guide détaille le déploiement du bot sur différentes plateformes.
    TIMEZONE=Europe/Paris
    ```
 
-4. **Déploiement** :
-   ```
-   Container Manager → Project → Create
-   → Set project folder path
-   → docker-compose.yml détecté automatiquement
-   → Build and run
-   ```
+4. **Déploiement du container** :
+   - Ouvrir **Container Manager**
+   - Aller dans **Project** → **Create**
+   - Sélectionner le dossier du projet
+   - `docker-compose.yml` sera détecté automatiquement
+   - Cliquer sur **Build and Run**
+   - Le bot démarre automatiquement
 
-### Méthode 2: SSH (Avancé)
+5. **Vérification** :
+   - Dans Container Manager → Project → discord-bot
+   - Vérifier que le statut est **Running**
+   - Cliquer sur les logs pour voir la connexion Discord
+
+---
+
+### Méthode 2: Déploiement via SSH (Avancé)
 
 ```bash
 # Connexion SSH au NAS
 ssh admin@ip-de-votre-nas
 
-# Navigation vers dossier Docker
+# Navigation vers le dossier Docker
 cd /volume1/docker/
 
 # Clone du projet
-sudo git clone https://github.com/votre-username/discord-plateau-bot.git
+sudo git clone https://github.com/Kiwi41/discord-plateau-bot.git
 cd discord-plateau-bot
 
-# Configuration
+# Configuration des variables
 sudo cp .env.example .env
-sudo nano .env  # Éditer avec vos tokens
+sudo nano .env  # Éditer avec vos tokens Discord
 
-# Démarrage
+# Démarrage du container
 sudo docker compose up -d
 
-# Vérification
-sudo docker compose logs -f plateau-bot
-```
-
-### Monitoring Synology
-
-1. **Container Manager** → plateau-bot → Details
-2. **Logs** : Affichage temps réel
-3. **Auto-restart** : Configuré dans docker-compose.yml
-4. **Ressources** : CPU/RAM monitoring
-
----
-
-## ⚡ Heroku (Payant mais Stable)
-
-### Configuration Heroku
-
-1. **Heroku CLI** :
-   ```bash
-   # Installation
-   curl https://cli-assets.heroku.com/install.sh | sh
-   
-   # Login
-   heroku login
-   ```
-
-2. **Création app** :
-   ```bash
-   heroku create discord-plateau-bot-nom-unique
-   ```
-
-3. **Variables** :
-   ```bash
-   heroku config:set DISCORD_TOKEN=votre_token
-   heroku config:set GUILD_ID=votre_guild_id
-   heroku config:set FORUM_CHANNEL_ID=votre_forum_channel_id
-   heroku config:set REGISTRATION_URL=votre_lien
-   ```
-
-4. **Déploiement** :
-   ```bash
-   git push heroku main
-   ```
-
-### Procfile (requis pour Heroku)
-
-```
-worker: node index.js
-```
-
-### Configuration Dynos
-
-```bash
-# Arrêter web dyno (gratuit, inutile pour un bot)
-heroku ps:scale web=0
-
-# Activer worker dyno ($7/mois)  
-heroku ps:scale worker=1
+# Vérification des logs
+sudo docker compose logs -f discord-bot
 ```
 
 ---
 
-## 🔧 Dépannage Commun
+### Monitoring et Gestion sur Synology
 
-### Logs Docker
+**Via Container Manager** :
+1. **Status** : Container Manager → Project → discord-bot → Details
+2. **Logs en temps réel** : Cliquer sur l'icône logs
+3. **Auto-restart** : Configuré automatiquement dans docker-compose.yml
+4. **Ressources** : Monitoring CPU/RAM dans l'onglet Performance
 
+**Via SSH** :
 ```bash
 # Voir les logs
-docker compose logs plateau-bot
+sudo docker compose logs discord-bot
 
 # Logs en temps réel
-docker compose logs -f plateau-bot
+sudo docker compose logs -f discord-bot
 
-# Redémarrer
-docker compose restart plateau-bot
+# Redémarrer le bot
+sudo docker compose restart discord-bot
+
+# Arrêter le bot
+sudo docker compose down
+
+# Démarrer le bot
+sudo docker compose up -d
 ```
 
-### Tests de Connectivité
+---
+
+## 🔄 Mise à Jour du Bot
+
+### Via Interface Web
+
+1. **Télécharger la nouvelle version** depuis GitHub
+2. **Remplacer les fichiers** dans File Station (sauf `.env`)
+3. **Container Manager** → Project → discord-bot → **Build**
+4. Le container redémarre automatiquement avec la nouvelle version
+
+### Via SSH
 
 ```bash
-# Test de construction
-docker build -t test-bot .
+# Se connecter au NAS
+ssh admin@ip-de-votre-nas
+cd /volume1/docker/discord-plateau-bot
 
-# Test d'exécution
-docker run --env-file .env test-bot
+# Télécharger les mises à jour
+sudo git pull origin master
 
-# Nettoyage
-docker rmi test-bot
+# Reconstruire et redémarrer
+sudo docker compose up -d --build
+
+# Vérifier le bon fonctionnement
+sudo docker compose logs --tail=50 discord-bot
 ```
 
-### Variables d'Environnement
+---
+
+## 🔧 Dépannage
+
+### Le container ne démarre pas
 
 ```bash
-# Vérification locale
-cat .env
+# Vérifier les logs d'erreur
+sudo docker compose logs discord-bot
 
-# Vérification dans container
-docker compose exec plateau-bot env | grep DISCORD
+# Vérifier la configuration
+sudo cat .env
+
+# Vérifier que tous les services Docker sont actifs
+sudo docker ps -a
+
+# Redémarrer proprement
+sudo docker compose down
+sudo docker compose up -d
+```
+
+### Le bot ne se connecte pas à Discord
+
+1. **Vérifier le token** :
+   - Le token Discord dans `.env` est correct
+   - Le token n'a pas expiré
+   - Le bot est activé dans le Developer Portal
+
+2. **Vérifier les logs** :
+   ```bash
+   sudo docker compose logs --tail=100 discord-bot
+   ```
+
+3. **Vérifier la connexion internet** :
+   ```bash
+   # Depuis le container
+   sudo docker compose exec discord-bot ping -c 3 discord.com
+   ```
+
+### Les posts ne sont pas créés automatiquement
+
+1. **Vérifier le timezone** :
+   - Dans `.env`, vérifier `TIMEZONE=Europe/Paris`
+   
+2. **Vérifier les permissions Discord** :
+   - Le bot a accès au canal forum
+   - Le bot a les permissions "Send Messages" et "Create Posts"
+
+3. **Vérifier le planning** :
+   - Les posts sont créés automatiquement chaque samedi à 3h
+   - Utiliser la commande `!plateau-help` pour tester
+
+### Problèmes de permissions
+
+```bash
+# Si les fichiers ne sont pas accessibles
+sudo chown -R admin:users /volume1/docker/discord-plateau-bot
+sudo chmod 644 /volume1/docker/discord-plateau-bot/.env
 ```
 
 ---
@@ -176,54 +203,146 @@ docker compose exec plateau-bot env | grep DISCORD
 
 ### Vérifications Régulières
 
-1. **Logs** : Vérifier absence d'erreurs
-2. **Uptime** : Bot connecté 24/7
-3. **Posts** : Création automatique samedis 3h
-4. **Ressources** : CPU/RAM usage
+**Hebdomadaire** :
+- ✅ Vérifier que les posts sont créés chaque samedi
+- ✅ Consulter les logs pour détecter les erreurs
+- ✅ Vérifier l'uptime du container
 
-### Mise à jour
+**Mensuel** :
+- ✅ Vérifier les mises à jour disponibles sur GitHub
+- ✅ Surveiller l'utilisation des ressources (CPU/RAM)
+- ✅ Faire une sauvegarde de la configuration `.env`
+
+### Commandes Utiles
 
 ```bash
-# Pull nouvelles versions
-git pull origin main
+# Status du container
+sudo docker compose ps
 
-# Redémarrage avec nouvelle image
-docker compose up -d --build
+# Utilisation des ressources
+sudo docker stats discord-bot
+
+# Redémarrage rapide
+sudo docker compose restart discord-bot
+
+# Voir tous les logs depuis le début
+sudo docker compose logs discord-bot
+
+# Nettoyer les anciens containers et images
+sudo docker system prune -a
 ```
 
-### Backup Configuration
+### Sauvegarde de la Configuration
 
 ```bash
-# Sauvegarder .env
-cp .env .env.backup
+# Sauvegarder le fichier .env
+sudo cp .env .env.backup.$(date +%Y%m%d)
 
-# Sauvegarder compose override si modifié
-cp docker-compose.yml docker-compose.yml.backup
+# Sauvegarder toute la configuration
+sudo tar -czf discord-bot-backup-$(date +%Y%m%d).tar.gz \
+  docker-compose.yml .env README.md
 ```
 
 ---
 
-## ❓ FAQ Déploiement
+## 💡 Utilisation Avancée
 
-**Q: Quelle plateforme choisir ?**
-- **Auto-hébergement** : NAS Synology (~2€/mois élec.)
-- **Simplicité et fiabilité** : Heroku (7$/mois, support professionnel)
+### Utiliser l'image Docker depuis GitHub Container Registry
 
-**Q: Combien coûte l'hébergement ?**
-- NAS Synology : ~2€/mois électricité
-- Heroku : 7$/mois
+Au lieu de compiler l'image localement, vous pouvez utiliser l'image pré-compilée :
 
-**Q: Le bot fonctionne hors ligne ?**
-Non, le bot nécessite une connexion internet constante pour Discord.
+1. **Modifier docker-compose.yml** :
+   ```yaml
+   services:
+     discord-bot:
+       image: ghcr.io/kiwi41/discord-plateau-bot:latest
+       # Remplacer "build: ." par l'image ci-dessus
+   ```
+
+2. **Télécharger et démarrer** :
+   ```bash
+   sudo docker compose pull
+   sudo docker compose up -d
+   ```
+
+### Variables d'Environnement Complètes
+
+```bash
+# Obligatoires
+DISCORD_TOKEN=votre_token_bot_discord
+GUILD_ID=id_de_votre_serveur
+FORUM_CHANNEL_ID=id_du_canal_forum
+
+# Optionnelles
+REGISTRATION_URL=https://votre-lien-inscription.com
+TIMEZONE=Europe/Paris
+LOG_LEVEL=INFO
+```
+
+### Commandes Discord Disponibles
+
+- **!create-plateau-post** : Crée manuellement un post pour le prochain vendredi
+- **!process-next-month** : Crée les 4 posts pour le mois suivant
+- **!plateau-help** : Affiche l'aide avec toutes les commandes
+
+---
+
+## 🔒 Sécurité
+
+### Bonnes Pratiques
+
+1. **Ne jamais committer le fichier .env** dans Git
+2. **Utiliser des tokens dédiés** pour chaque environnement
+3. **Limiter les permissions** du bot Discord au strict nécessaire
+4. **Sauvegarder régulièrement** la configuration
+5. **Surveiller les logs** pour détecter les anomalies
+
+### Permissions Discord Requises
+
+Le bot a besoin des permissions suivantes :
+- ✅ Read Messages/View Channels
+- ✅ Send Messages
+- ✅ Create Posts (pour les forums)
+- ✅ Embed Links
+- ✅ Read Message History
+
+---
+
+## ❓ FAQ
+
+**Q: Combien coûte l'hébergement sur Synology ?**
+Environ 2€/mois en électricité, selon votre NAS et votre fournisseur d'énergie.
+
+**Q: Le bot fonctionne-t-il hors ligne ?**
+Non, le bot nécessite une connexion internet constante pour communiquer avec Discord.
 
 **Q: Puis-je héberger plusieurs bots ?**
-Oui, chaque bot nécessite son propre token et container.
+Oui, clonez le projet dans un autre dossier avec un fichier `.env` différent et un nom de projet différent dans docker-compose.yml.
 
-**Q: Consommation ressources ?**
-- RAM : ~50MB en fonctionnement
-- CPU : Minimal (pics lors création posts)
-- Réseau : ~1MB/jour
+**Q: Quelle est la consommation de ressources ?**
+- RAM : ~50-80 MB en fonctionnement normal
+- CPU : Minimal (pics lors de la création des posts)
+- Disque : ~200 MB pour l'image Docker
+- Réseau : ~1-2 MB/jour
+
+**Q: Que se passe-t-il en cas de redémarrage du NAS ?**
+Le bot redémarre automatiquement grâce à `restart: unless-stopped` dans docker-compose.yml.
+
+**Q: Comment changer l'heure de création des posts ?**
+Modifiez la ligne du cron dans [bot.py](bot.py) : `0 3 * * 6` (samedi à 3h) puis reconstruisez le container.
+
+**Q: Le bot supporte-t-il plusieurs serveurs Discord ?**
+Le bot fonctionne sur un seul serveur à la fois. Pour plusieurs serveurs, déployez plusieurs instances du bot.
 
 ---
 
-*📝 Ce guide sera mis à jour selon les évolutions des plateformes de déploiement.*
+## 📞 Support
+
+- **Documentation** : [README.md](README.md)
+- **Problèmes** : Ouvrir une issue sur [GitHub](https://github.com/Kiwi41/discord-plateau-bot/issues)
+- **Logs** : Toujours inclure les logs lors d'une demande d'aide
+
+---
+
+*📝 Dernière mise à jour : Décembre 2024*
+*✨ Bot optimisé pour NAS Synology avec Container Manager*
