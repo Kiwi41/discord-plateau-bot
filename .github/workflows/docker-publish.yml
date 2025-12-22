@@ -9,7 +9,9 @@ on:
       - 'bot.py'
       - 'requirements.txt'
       - 'Dockerfile'
+      - 'docker-compose*.yml'
       - '.github/workflows/docker-publish.yml'
+    # Les commits de documentation ne déclenchent pas de build (économise les ressources)
   pull_request:
     branches:
       - main
