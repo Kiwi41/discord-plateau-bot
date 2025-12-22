@@ -120,6 +120,36 @@ TIMEZONE=Europe/Paris
 
 4. **Event ID** (optionnel) : ID de l'événement récurrent Discord
 
+### 📅 Format des Événements Discord
+
+Le bot détecte automatiquement les événements Discord et les lie aux posts de forum. Pour qu'un événement soit reconnu, il doit :
+
+**Critères de détection** :
+1. ✅ **Date** : L'événement doit être programmé le vendredi ciblé
+2. ✅ **Nom** : Doit contenir l'un de ces mots-clés (insensible à la casse) :
+   - `plateau`
+   - `soirée` (ou `soiree`)
+   - `jeu`
+   - `board`
+   - `game`
+
+**Exemples de noms valides** :
+- ✅ "Soirée Plateaux"
+- ✅ "Jeux de plateau"
+- ✅ "Board Game Night"
+- ✅ "Soirée jeu conviviale"
+- ✅ "Plateau du vendredi"
+- ❌ "Réunion" (pas de mot-clé)
+- ❌ "Cinema" (pas de mot-clé)
+
+**Configuration dans Discord** :
+1. Créer un événement sur votre serveur
+2. Date : Le vendredi souhaité (18h00 recommandé)
+3. Nom : Inclure un mot-clé (ex: "Soirée Plateaux")
+4. Le bot détectera et liera automatiquement l'événement au post
+
+**Note** : Si aucun événement n'est trouvé, le post sera créé sans lien événement, avec juste le lien d'inscription configuré dans `REGISTRATION_URL`.
+
 ## 📝 Commandes disponibles
 
 - `!create-plateau-post` : Crée ou met à jour le post pour le prochain vendredi

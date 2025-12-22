@@ -440,9 +440,28 @@ FORUM_CHANNEL_ID=id_du_canal_forum
 
 # Optionnelles
 REGISTRATION_URL=https://votre-lien-inscription.com
+EVENT_ID=id_event_discord_optionnel
 TIMEZONE=Europe/Paris
 LOG_LEVEL=INFO
 ```
+
+### 📅 Configuration des Événements Discord
+
+Le bot lie automatiquement les posts aux événements Discord. Pour qu'un événement soit détecté :
+
+**Critères obligatoires** :
+- 📆 **Date** : Programmé le vendredi du post
+- 🏷️ **Nom** : Contient un mot-clé : `plateau`, `soirée`, `jeu`, `board` ou `game`
+
+**Exemples** :
+```
+✅ "Soirée Plateaux"
+✅ "Board Game Night" 
+✅ "Jeux du vendredi"
+❌ "Réunion mensuelle" (pas de mot-clé)
+```
+
+Si aucun événement n'est trouvé, le bot utilise `REGISTRATION_URL` pour le lien d'inscription.
 
 ### Commandes Discord Disponibles
 
