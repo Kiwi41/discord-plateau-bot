@@ -147,6 +147,90 @@ def find_friday_event(all_events, target_date):
         return None
 
 
+async def get_event_participants(event):
+    """Récupérer la liste des participants d'un événement Discord."""
+    try:
+        # Récupérer les utilisateurs intéressés par l'événement
+        participants = []
+        
+        # Discord API retourne les utilisateurs intéressés via event.users
+        async for user in event.users():
+            if not user.bot:  # Ignorer les bots
+                participants.append(user)
+        
+        return participants
+        
+    except Exception as error:
+        print(f"⚠️  Erreur lors de la récupération des participants: {error}")
+        return []
+
+
+async def update_post_participants(post, event):
+    """Mettre à jour la liste des participants dans un post existant."""
+    try:
+        # Récupérer les participants de l'événement
+        participants = await get_event_participants(event)
+        
+        # Récupérer le premier message du post (le message principal)
+        first_message = await anext(post.history(limit=1, oldest_first=True))
+        
+        if not first_message or not first_message.embeds:
+            return False
+        
+        # Copier l'embed existant
+        old_embed = first_message.embeds[0]
+        new_embed = discord.Embed(
+            title=old_embed.title,
+            description=old_embed.description,
+            color=old_embed.color,
+            timestamp=old_embed.timestamp
+        )
+        
+        # Copier tous les champs existants sauf celui des participants
+        for field in old_embed.fields:
+            if not field.name.startswith('👥'):
+                new_embed.add_field(name=field.name, value=field.value, inline=field.inline)
+        
+        # Ajouter ou mettre à jour le champ des participants
+        if participants:
+            participant_count = len(participants)
+            participant_names = ', '.join([p.display_name for p in participants[:10]])  # Limiter à 10 noms
+            
+            if participant_count > 10:
+                participant_names += f'... et {participant_count - 10} autre(s)'
+            
+            participants_text = f"**{participant_count} participant(s)**\n{participant_names}"
+        else:
+            participants_text = "Aucun participant pour le moment"
+        
+        new_embed.add_field(name='👥 Participants', value=participants_text, inline=False)
+        
+        # Copier le footer
+        if old_embed.footer:
+            new_embed.set_footer(text=old_embed.footer.text)
+        
+        # Vérifier si le contenu a changé
+        old_participant_field = None
+        for field in old_embed.fields:
+            if field.name.startswith('👥'):
+                old_participant_field = field.value
+                break
+        
+        new_participant_field = participants_text
+        
+        if old_participant_field == new_participant_field:
+            return False  # Pas de changement
+        
+        # Mettre à jour le message
+        await first_message.edit(embed=new_embed)
+        print(f"✅ Liste des participants mise à jour: {len(participants)} participant(s)")
+        return True
+        
+    except Exception as error:
+        print(f"❌ Erreur lors de la mise à jour des participants: {error}")
+        return False
+
+
 async def check_for_duplicates(forum_channel, post_title):
     """Vérifier les doublons dans le forum."""
     try:
@@ -558,9 +642,12 @@ async def on_ready():
     print("   - !process-next-month (4 prochains vendredis)")
     print("   - !plateau-help (aide)")
     
-    # Démarrer la tâche planifiée
+    # Démarrer les tâches planifiées
     if not scheduled_task.is_running():
         scheduled_task.start()
+    if not update_participants_task.is_running():
+        update_participants_task.start()
+        print("👥 Mise à jour des participants activée (toutes les 15 minutes)")
 
 
 @tasks.loop(hours=24)
@@ -572,6 +659,60 @@ async def scheduled_task():
     if now.weekday() == 5 and now.hour == 3:  # 5 = samedi
         print("⏰ Tâche planifiée déclenchée - Traitement des 4 prochains vendredis (Samedi 3h00)")
         await process_next_four_fridays()
+
+
+@tasks.loop(minutes=15)
+async def update_participants_task():
+    """Tâche qui met à jour la liste des participants toutes les 15 minutes."""
+    try:
+        print("👥 Mise à jour de la liste des participants...")
+        
+        guild = bot.get_guild(GUILD_ID)
+        if not guild:
+            print("❌ Serveur Discord non trouvé")
+            return
+        
+        forum_channel = guild.get_channel(FORUM_CHANNEL_ID)
+        if not forum_channel:
+            print("❌ Canal forum non trouvé")
+            return
+        
+        # Récupérer les événements Discord
+        all_events = await fetch_discord_events_with_retry(guild)
+        if not all_events:
+            print("⚠️  Aucun événement disponible")
+            return
+        
+        # Récupérer les 4 prochains vendredis
+        fridays = get_next_four_fridays()
+        updated_count = 0
+        
+        for friday_date in fridays:
+            # Trouver l'événement correspondant
+            friday_event = find_friday_event(all_events, friday_date)
+            if not friday_event:
+                continue
+            
+            # Rechercher le post forum correspondant
+            formatted_date = friday_date.strftime('%A %d %B %Y').capitalize()
+            post_title = f"Soirée Plateaux - {formatted_date}"
+            
+            existing_post = await check_for_duplicates(forum_channel, post_title)
+            if not existing_post:
+                continue
+            
+            # Mettre à jour les participants
+            updated = await update_post_participants(existing_post, friday_event)
+            if updated:
+                updated_count += 1
+        
+        if updated_count > 0:
+            print(f"✅ {updated_count} post(s) mis à jour avec la liste des participants")
+        else:
+            print("ℹ️  Aucune mise à jour de participants nécessaire")
+            
+    except Exception as error:
+        print(f"❌ Erreur lors de la mise à jour des participants: {error}")
 
 
 @bot.event
@@ -639,12 +780,27 @@ async def plateau_help_command(ctx):
         inline=False
     )
     embed.add_field(
+        name='!update-participants',
+        value='Force la mise à jour de la liste des participants',
+        inline=False
+    )
+    embed.add_field(
         name='!plateau-help',
         value='Affiche cette aide',
         inline=False
     )
     
+    embed.set_footer(text='🔄 Les participants se mettent à jour automatiquement toutes les 15 minutes')
+    
     await ctx.reply(embed=embed)
+
+
+@bot.command(name='update-participants')
+async def update_participants_command(ctx):
+    """Commande pour forcer la mise à jour des participants."""
+    await ctx.reply("👥 Mise à jour des participants en cours...")
+    await update_participants_task()
+    await ctx.send("✅ Mise à jour des participants terminée!")
 
 
 # Lancement du bot
