@@ -2,6 +2,45 @@
 
 Ce guide détaille le déploiement du bot en container Docker sur votre NAS Synology.
 
+## 📊 Architecture de Déploiement
+
+```mermaid
+graph TB
+    subgraph "☁️ GitHub"
+        CODE[Code Source<br/>bot.py]
+        GHCR[GitHub Container Registry<br/>ghcr.io/kiwi41/discord-plateau-bot:latest]
+        GA[GitHub Actions<br/>Build & Publish]
+    end
+    
+    subgraph "🏠 NAS Synology"
+        CM[Container Manager]
+        DC[docker-compose.prod.yml]
+        ENV[.env<br/>🔒 Secrets]
+        BOT[🤖 Bot Container<br/>Running]
+    end
+    
+    subgraph "☁️ Discord"
+        API[Discord API]
+        FORUM[Forum Canal<br/>Planning Plateau]
+        EVENTS[Discord Events]
+    end
+    
+    CODE -->|push| GA
+    GA -->|build & push| GHCR
+    GHCR -->|docker pull| CM
+    DC -->|config| CM
+    ENV -->|secrets| CM
+    CM -->|run| BOT
+    BOT <-->|WebSocket| API
+    BOT -->|create posts| FORUM
+    BOT -->|link events| EVENTS
+    
+    style GHCR fill:#2ea44f
+    style BOT fill:#5865F2
+    style ENV fill:#ff6b6b
+    style FORUM fill:#5865F2
+```
+
 ---
 
 ## 🏠 Déploiement sur NAS Synology
@@ -17,6 +56,20 @@ Ce guide détaille le déploiement du bot en container Docker sur votre NAS Syno
 ## 🚀 Méthode Rapide : Utiliser l'Image Pré-compilée (Recommandé)
 
 Cette méthode utilise l'image Docker pré-compilée depuis GitHub Container Registry. **Pas besoin de compiler l'image localement !**
+
+```mermaid
+graph LR
+    A[📥 Télécharger<br/>docker-compose.prod.yml] --> B[✏️ Créer<br/>.env]
+    B --> C[🚀 Container Manager<br/>Create Project]
+    C --> D[⬇️ Pull Image<br/>depuis GitHub]
+    D --> E[✅ Bot Running]
+    
+    style A fill:#96ceb4
+    style B fill:#ff6b6b
+    style C fill:#ffeaa7
+    style D fill:#74b9ff
+    style E fill:#2ea44f
+```
 
 ### Via Container Manager (Interface Web)
 
@@ -151,6 +204,26 @@ sudo docker compose logs -f discord-bot
 ---
 
 ## 🔄 Mise à Jour du Bot
+
+```mermaid
+sequenceDiagram
+    participant DEV as 👨‍💻 Développeur
+    participant GH as GitHub
+    participant GA as GitHub Actions
+    participant GHCR as Container Registry
+    participant NAS as 🏠 NAS Synology
+    participant BOT as 🤖 Bot
+    
+    DEV->>GH: git push
+    GH->>GA: Trigger workflow
+    GA->>GA: Build Docker image
+    GA->>GHCR: Push image:latest
+    Note over NAS: Mise à jour manuelle
+    NAS->>GHCR: docker compose pull
+    GHCR-->>NAS: Nouvelle image
+    NAS->>BOT: Redémarrer container
+    BOT->>BOT: ✅ Version mise à jour
+```
 
 ### Si vous utilisez l'image pré-compilée (docker-compose.prod.yml)
 

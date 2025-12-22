@@ -2,7 +2,31 @@
 
 Le bot Python est automatiquement publié sur GitHub Container Registry (ghcr.io) via GitHub Actions.
 
-## 📦 Image disponible
+## � Workflow de Publication
+
+```mermaid
+sequenceDiagram
+    participant DEV as 👨‍💻 Dev
+    participant GH as GitHub Repo
+    participant GA as GitHub Actions
+    participant BUILD as 🔨 Build Process
+    participant GHCR as 📦 Container Registry
+    participant USER as 🏠 Utilisateur
+    
+    DEV->>GH: git push (bot.py, Dockerfile)
+    GH->>GA: Trigger workflow
+    GA->>BUILD: Checkout code
+    BUILD->>BUILD: Setup Docker Buildx
+    BUILD->>BUILD: Build multi-arch<br/>(amd64, arm64)
+    BUILD->>BUILD: Tag: latest, master, sha-xxx
+    BUILD->>GHCR: Push images
+    GHCR-->>USER: docker pull ghcr.io/kiwi41/discord-plateau-bot:latest
+    
+    Note over GA,BUILD: Automated CI/CD
+    Note over GHCR: Public Registry
+```
+
+## �📦 Image disponible
 
 ```bash
 ghcr.io/VOTRE_USERNAME/discord-python:latest
@@ -54,10 +78,34 @@ Le workflow utilise `GITHUB_TOKEN` automatique, aucune configuration supplément
 
 ## 🔄 Déploiement automatique
 
+```mermaid
+graph TD
+    A[📝 Code Change] --> B{Branch?}
+    B -->|master/main| C[✅ Trigger Workflow]
+    B -->|other| X[❌ Skip]
+    
+    C --> D{Files Changed?}
+    D -->|bot.py| E[🔨 Build]
+    D -->|Dockerfile| E
+    D -->|requirements.txt| E
+    D -->|other| X
+    
+    E --> F[🏗️ Multi-arch Build<br/>amd64 + arm64]
+    F --> G[🏷️ Create Tags<br/>latest, master, sha-xxx]
+    G --> H[📤 Push to GHCR]
+    H --> I[✅ Available for Pull]
+    
+    style C fill:#55efc4
+    style E fill:#74b9ff
+    style F fill:#fdcb6e
+    style H fill:#00b894
+    style X fill:#b2bec3
+```
+
 L'image est automatiquement buildée et publiée quand :
 
 ✅ Push sur la branche `main` ou `master`
-✅ Modification de `bot.py`, `requirements.txt` ou `Dockerfile.python`
+✅ Modification de `bot.py`, `requirements.txt` ou `Dockerfile`
 ✅ Déclenchement manuel via GitHub Actions
 
 ## 🏷️ Tags disponibles
@@ -94,6 +142,39 @@ docker pull ghcr.io/VOTRE_USERNAME/discord-python:latest
 ```
 
 ## 📊 Multi-architecture
+
+```mermaid
+graph TB
+    subgraph "🔨 Build Process"
+        BUILD[Docker Buildx]
+    end
+    
+    subgraph "🏗️ Architectures"
+        AMD[linux/amd64<br/>x86_64]
+        ARM[linux/arm64<br/>aarch64]
+    end
+    
+    subgraph "💻 Plateformes Supportées"
+        PC[PC / Serveurs<br/>VPS Cloud]
+        RPI[Raspberry Pi 4/5<br/>Mac M1/M2/M3]
+        NAS[NAS Synology<br/>ARM/x86]
+    end
+    
+    BUILD --> AMD
+    BUILD --> ARM
+    
+    AMD --> PC
+    ARM --> RPI
+    AMD --> NAS
+    ARM --> NAS
+    
+    style BUILD fill:#2496ed
+    style AMD fill:#74b9ff
+    style ARM fill:#fdcb6e
+    style PC fill:#55efc4
+    style RPI fill:#00b894
+    style NAS fill:#6c5ce7
+```
 
 L'image est buildée pour :
 - `linux/amd64` (x86_64) - PC, serveurs, la plupart des VPS
