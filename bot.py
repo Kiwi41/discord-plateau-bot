@@ -148,17 +148,17 @@ def find_friday_event(all_events, target_date):
 
 
 async def get_event_participants(event):
-    """Récupérer la liste des participants d'un événement Discord."""
+    """Récupérer la liste des personnes inscrites à un événement Discord."""
     try:
         # Récupérer les utilisateurs intéressés par l'événement
-        participants = []
+        personnes_inscrites = []
         
         # Discord API retourne les utilisateurs intéressés via event.users
         async for user in event.users():
             if not user.bot:  # Ignorer les bots
-                participants.append(user)
+                personnes_inscrites.append(user)
         
-        return participants
+        return personnes_inscrites
         
     except Exception as error:
         print(f"⚠️  Erreur lors de la récupération des participants: {error}")
@@ -166,10 +166,10 @@ async def get_event_participants(event):
 
 
 async def update_post_participants(post, event):
-    """Mettre à jour la liste des participants dans un post existant."""
+    """Mettre à jour la liste des personnes inscrites dans un post existant."""
     try:
-        # Récupérer les participants de l'événement
-        participants = await get_event_participants(event)
+        # Récupérer les personnes inscrites à l'événement
+        personnes_inscrites = await get_event_participants(event)
         
         # Récupérer le premier message du post (le message principal)
         first_message = await anext(post.history(limit=1, oldest_first=True))
@@ -186,48 +186,48 @@ async def update_post_participants(post, event):
             timestamp=old_embed.timestamp
         )
         
-        # Copier tous les champs existants sauf celui des participants
+        # Copier tous les champs existants sauf celui des personnes inscrites
         for field in old_embed.fields:
             if not field.name.startswith('👥'):
                 new_embed.add_field(name=field.name, value=field.value, inline=field.inline)
         
-        # Ajouter ou mettre à jour le champ des participants
-        if participants:
-            participant_count = len(participants)
-            participant_names = ', '.join([p.display_name for p in participants[:10]])  # Limiter à 10 noms
+        # Ajouter ou mettre à jour le champ des personnes inscrites
+        if personnes_inscrites:
+            count = len(personnes_inscrites)
+            names = ', '.join([p.display_name for p in personnes_inscrites[:10]])  # Limiter à 10 noms
             
-            if participant_count > 10:
-                participant_names += f'... et {participant_count - 10} autre(s)'
+            if count > 10:
+                names += f'... et {count - 10} autre(s)'
             
-            participants_text = f"**{participant_count} participant(s)**\n{participant_names}"
+            inscriptions_text = f"**{count} personne(s) inscrite(s)**\n{names}"
         else:
-            participants_text = "Aucun participant pour le moment"
+            inscriptions_text = "Aucune inscription pour le moment"
         
-        new_embed.add_field(name='👥 Participants', value=participants_text, inline=False)
+        new_embed.add_field(name='👥 Inscriptions', value=inscriptions_text, inline=False)
         
         # Copier le footer
         if old_embed.footer:
             new_embed.set_footer(text=old_embed.footer.text)
         
         # Vérifier si le contenu a changé
-        old_participant_field = None
+        old_inscriptions_field = None
         for field in old_embed.fields:
             if field.name.startswith('👥'):
-                old_participant_field = field.value
+                old_inscriptions_field = field.value
                 break
         
-        new_participant_field = participants_text
+        new_inscriptions_field = inscriptions_text
         
-        if old_participant_field == new_participant_field:
+        if old_inscriptions_field == new_inscriptions_field:
             return False  # Pas de changement
         
         # Mettre à jour le message
         await first_message.edit(embed=new_embed)
-        print(f"✅ Liste des participants mise à jour: {len(participants)} participant(s)")
+        print(f"✅ Liste des inscriptions mise à jour: {len(personnes_inscrites)} personne(s)")
         return True
         
     except Exception as error:
-        print(f"❌ Erreur lors de la mise à jour des participants: {error}")
+        print(f"❌ Erreur lors de la mise à jour des inscriptions: {error}")
         return False
 
 
@@ -647,7 +647,7 @@ async def on_ready():
         scheduled_task.start()
     if not update_participants_task.is_running():
         update_participants_task.start()
-        print("👥 Mise à jour des participants activée (toutes les 15 minutes)")
+        print("👥 Mise à jour des inscriptions activée (toutes les 15 minutes)")
 
 
 @tasks.loop(hours=24)
@@ -663,9 +663,9 @@ async def scheduled_task():
 
 @tasks.loop(minutes=15)
 async def update_participants_task():
-    """Tâche qui met à jour la liste des participants toutes les 15 minutes."""
+    """Tâche qui met à jour la liste des inscriptions toutes les 15 minutes."""
     try:
-        print("👥 Mise à jour de la liste des participants...")
+        print("👥 Mise à jour de la liste des inscriptions...")
         
         guild = bot.get_guild(GUILD_ID)
         if not guild:
@@ -701,18 +701,18 @@ async def update_participants_task():
             if not existing_post:
                 continue
             
-            # Mettre à jour les participants
+            # Mettre à jour les inscriptions
             updated = await update_post_participants(existing_post, friday_event)
             if updated:
                 updated_count += 1
         
         if updated_count > 0:
-            print(f"✅ {updated_count} post(s) mis à jour avec la liste des participants")
+            print(f"✅ {updated_count} post(s) mis à jour avec la liste des inscriptions")
         else:
-            print("ℹ️  Aucune mise à jour de participants nécessaire")
+            print("ℹ️  Aucune mise à jour d'inscriptions nécessaire")
             
     except Exception as error:
-        print(f"❌ Erreur lors de la mise à jour des participants: {error}")
+        print(f"❌ Erreur lors de la mise à jour des inscriptions: {error}")
 
 
 @bot.event
@@ -781,7 +781,7 @@ async def plateau_help_command(ctx):
     )
     embed.add_field(
         name='!update-participants',
-        value='Force la mise à jour de la liste des participants',
+        value='Force la mise à jour de la liste des inscriptions',
         inline=False
     )
     embed.add_field(
@@ -790,17 +790,17 @@ async def plateau_help_command(ctx):
         inline=False
     )
     
-    embed.set_footer(text='🔄 Les participants se mettent à jour automatiquement toutes les 15 minutes')
+    embed.set_footer(text='🔄 Les inscriptions se mettent à jour automatiquement toutes les 15 minutes')
     
     await ctx.reply(embed=embed)
 
 
 @bot.command(name='update-participants')
 async def update_participants_command(ctx):
-    """Commande pour forcer la mise à jour des participants."""
-    await ctx.reply("👥 Mise à jour des participants en cours...")
+    """Commande pour forcer la mise à jour des inscriptions."""
+    await ctx.reply("👥 Mise à jour des inscriptions en cours...")
     await update_participants_task()
-    await ctx.send("✅ Mise à jour des participants terminée!")
+    await ctx.send("✅ Mise à jour des inscriptions terminée!")
 
 
 # Lancement du bot

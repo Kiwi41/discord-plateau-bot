@@ -155,22 +155,22 @@ Le bot détecte automatiquement les événements Discord et les lie aux posts de
 - `!create-plateau-post` : Crée ou met à jour le post pour le prochain vendredi
 - `!process-next-month` : Traite les 4 prochains vendredis (création + mise à jour)
 - `!plateau-next-month` : Alias pour !process-next-month
-- `!update-participants` : Force la mise à jour de la liste des participants
+- `!update-participants` : Force la mise à jour de la liste des inscriptions
 - `!plateau-help` : Affiche l'aide des commandes
 - `!test` : Teste la réception des messages
 
-## 👥 Mise à Jour Automatique des Participants
+## 👥 Mise à Jour Automatique des Inscriptions
 
-Le bot met à jour automatiquement la liste des participants dans les posts de forum :
+Le bot met à jour automatiquement la liste des personnes inscrites dans les posts de forum :
 - ✅ **Vérification automatique** : Toutes les 15 minutes
 - 👤 **Source** : Utilisateurs inscrits aux événements Discord
-- 📊 **Affichage** : Nombre + noms des participants (max 10 affichés)
-- 🔄 **Temps réel** : Les posts se mettent à jour dès qu'un utilisateur s'inscrit ou se désinscrit
+- 📊 **Affichage** : Nombre + noms des personnes (max 10 affichés)
+- 🔄 **Temps réel** : Les posts se mettent à jour dès qu'une personne s'inscrit ou se désinscrit
 
 **Exemple dans le post** :
 ```
-👥 Participants
-12 participant(s)
+👥 Inscriptions
+12 personne(s) inscrite(s)
 Alice, Bob, Charlie, David, Emma, Frank, Grace, Henry, Iris, Jack... et 2 autre(s)
 ```
 
