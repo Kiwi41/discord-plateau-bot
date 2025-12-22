@@ -15,11 +15,14 @@ graph LR
     F --> G
     G --> H[📢 Post publié]
     
-    style A fill:#ffeaa7
-    style B fill:#74b9ff
-    style E fill:#55efc4
-    style F fill:#fdcb6e
-    style H fill:#00b894
+    style A fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style B fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style C fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style D fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style E fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style F fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style G fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style H fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
 ```
 
 ## ✨ Fonctionnalités
@@ -50,11 +53,15 @@ flowchart TD
     
     D4 --> SUCCESS([✅ Bot Running])
     
-    style START fill:#55efc4
-    style CHOICE fill:#74b9ff
-    style D2 fill:#ff6b6b
-    style D3 fill:#fdcb6e
-    style SUCCESS fill:#00b894
+    style START fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style CHOICE fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style D1 fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style L1 fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style D2 fill:#d73a49,stroke:#f85149,stroke-width:2px,color:#fff
+    style L2 fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style D3 fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style D4 fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style SUCCESS fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
 ```
 
 ### Option 1: Docker (Recommandé)
@@ -158,10 +165,17 @@ graph TB
     GA --> GHCR
     GHCR --> DOCKER
     
-    style PY fill:#3776ab
-    style DOCKER fill:#2496ed
-    style DISCORD fill:#5865F2
-    style GHCR fill:#2ea44f
+    style PY fill:#1e5a8e,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style DPY fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style DOTENV fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style PYTZ fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style ASYNC fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style DOCKER fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style COMPOSE fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style ALPINE fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style DISCORD fill:#404eed,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style GHCR fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style GA fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
 ```
 
 ## 📦 Structure du projet

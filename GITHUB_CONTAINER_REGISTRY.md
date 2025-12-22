@@ -24,6 +24,8 @@ sequenceDiagram
     
     Note over GA,BUILD: Automated CI/CD
     Note over GHCR: Public Registry
+    
+    %%{init: {'theme':'dark'}}%%
 ```
 
 ## �📦 Image disponible
@@ -95,11 +97,16 @@ graph TD
     G --> H[📤 Push to GHCR]
     H --> I[✅ Available for Pull]
     
-    style C fill:#55efc4
-    style E fill:#74b9ff
-    style F fill:#fdcb6e
-    style H fill:#00b894
-    style X fill:#b2bec3
+    style A fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style B fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style C fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style D fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style E fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style F fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style G fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style H fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style I fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style X fill:#6e7681,stroke:#484f58,stroke-width:2px,color:#fff
 ```
 
 L'image est automatiquement buildée et publiée quand :
@@ -168,12 +175,12 @@ graph TB
     AMD --> NAS
     ARM --> NAS
     
-    style BUILD fill:#2496ed
-    style AMD fill:#74b9ff
-    style ARM fill:#fdcb6e
-    style PC fill:#55efc4
-    style RPI fill:#00b894
-    style NAS fill:#6c5ce7
+    style BUILD fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style AMD fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style ARM fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style PC fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style RPI fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
+    style NAS fill:#6639ba,stroke:#8957e5,stroke-width:2px,color:#fff
 ```
 
 L'image est buildée pour :

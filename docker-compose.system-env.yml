@@ -1,0 +1,19 @@
+services:
+  discord-bot:
+    image: ghcr.io/kiwi41/discord-plateau-bot:latest
+    container_name: discord-plateau-bot
+    restart: unless-stopped
+    environment:
+      # MÉTHODE 2 : Variables héritées de l'environnement système
+      # Les valeurs sont prises depuis l'environnement du shell qui lance docker-compose
+      - DISCORD_TOKEN
+      - GUILD_ID
+      - FORUM_CHANNEL_ID
+      - REGISTRATION_URL
+      - EVENT_ID
+      - TIMEZONE=Europe/Paris  # Valeur par défaut
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -35,10 +35,16 @@ graph TB
     BOT -->|create posts| FORUM
     BOT -->|link events| EVENTS
     
-    style GHCR fill:#2ea44f
-    style BOT fill:#5865F2
-    style ENV fill:#ff6b6b
-    style FORUM fill:#5865F2
+    style GHCR fill:#1a7f37,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style BOT fill:#404eed,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style ENV fill:#d73a49,stroke:#f85149,stroke-width:2px,color:#fff
+    style FORUM fill:#404eed,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style CODE fill:#0d1117,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style GA fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style CM fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style DC fill:#161b22,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style API fill:#404eed,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style EVENTS fill:#404eed,stroke:#1f6feb,stroke-width:2px,color:#fff
 ```
 
 ---
@@ -64,11 +70,11 @@ graph LR
     C --> D[⬇️ Pull Image<br/>depuis GitHub]
     D --> E[✅ Bot Running]
     
-    style A fill:#96ceb4
-    style B fill:#ff6b6b
-    style C fill:#ffeaa7
-    style D fill:#74b9ff
-    style E fill:#2ea44f
+    style A fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style B fill:#d73a49,stroke:#f85149,stroke-width:2px,color:#fff
+    style C fill:#966600,stroke:#bb7700,stroke-width:2px,color:#fff
+    style D fill:#0969da,stroke:#1f6feb,stroke-width:2px,color:#fff
+    style E fill:#1a7f37,stroke:#2ea043,stroke-width:2px,color:#fff
 ```
 
 ### Via Container Manager (Interface Web)
@@ -223,6 +229,8 @@ sequenceDiagram
     GHCR-->>NAS: Nouvelle image
     NAS->>BOT: Redémarrer container
     BOT->>BOT: ✅ Version mise à jour
+    
+    %%{init: {'theme':'dark'}}%%
 ```
 
 ### Si vous utilisez l'image pré-compilée (docker-compose.prod.yml)
