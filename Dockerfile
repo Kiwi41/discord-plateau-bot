@@ -25,6 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code du bot
 COPY bot.py .
+COPY stats_manager.py .
 
 # Créer un utilisateur non-root pour exécuter le bot
 RUN useradd -m -u 1000 botuser && \
