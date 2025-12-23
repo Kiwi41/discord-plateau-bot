@@ -12,6 +12,7 @@ import asyncio
 import locale
 from dotenv import load_dotenv
 import pytz
+from stats_manager import StatsManager
 
 # Charger les variables d'environnement
 load_dotenv()
@@ -38,6 +39,9 @@ intents.messages = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
+
+# Initialiser le gestionnaire de statistiques
+stats_manager = StatsManager('stats.json')
 
 # Définir la locale française pour le formatage des dates
 try:
@@ -427,6 +431,21 @@ async def update_existing_post(thread, embed, event_info):
                 else:
                     print("✅ Aucune mise à jour nécessaire")
                     return False
+                
+                # Enregistrer les stats si la mise à jour a eu lieu
+                if participant_list:
+                    try:
+                        event_date_iso = friday_date.isoformat()
+                        event_name = f"Soirée Plateaux - {format_date(friday_date)}"
+                        participant_names = [p.strip() for p in participant_list]
+                        stats_manager.record_event(
+                            event_date=event_date_iso,
+                            event_name=event_name,
+                            participants=participant_names,
+                            event_id=str(event.id) if event else None
+                        )
+                    except Exception as stats_error:
+                        print(f"⚠️ Erreur lors de l'enregistrement des stats: {stats_error}")
                 
                 break
         
@@ -1005,6 +1024,123 @@ async def process_friday_command(ctx, date_str: str):
         await ctx.send(f"❌ Erreur: {str(e)}")
 
 
+@bot.command(name='stats')
+async def stats_command(ctx, participant_name: str = None):
+    """Commande pour afficher les statistiques des soirées plateaux."""
+    try:
+        if participant_name:
+            # Statistiques pour un·e participant·e spécifique
+            participant_stats = stats_manager.get_participant_stats(participant_name)
+            if not participant_stats:
+                await ctx.send(f"❌ Aucune donnée trouvée pour {participant_name}")
+                return
+            
+            embed = discord.Embed(
+                title=f'📊 Statistiques de {participant_name}',
+                color=0x7289DA,
+                timestamp=datetime.now(tz)
+            )
+            
+            embed.add_field(
+                name='📈 Participations',
+                value=f'**Total:** {participant_stats["total_events"]} soirées',
+                inline=False
+            )
+            
+            embed.add_field(
+                name='📅 Première participation',
+                value=participant_stats['first_attendance'],
+                inline=False
+            )
+            
+            # Liste des événements récents
+            recent_events = sorted(participant_stats['events_attended'], reverse=True)[:5]
+            if recent_events:
+                embed.add_field(
+                    name='🗓️ Dernières participations',
+                    value='\n'.join(recent_events[:5]),
+                    inline=False
+                )
+            
+            await ctx.send(embed=embed)
+        else:
+            # Statistiques générales
+            stats = stats_manager.export_stats()
+            
+            embed = discord.Embed(
+                title='📊 Statistiques des Soirées Plateaux',
+                description='Vue d\'ensemble de nos soirées jeux',
+                color=0x7289DA,
+                timestamp=datetime.now(tz)
+            )
+            
+            # Statistiques générales
+            embed.add_field(
+                name='🎲 Événements',
+                value=f'**Total:** {stats["total_events"]} soirées organisées',
+                inline=True
+            )
+            
+            embed.add_field(
+                name='👥 Participant·e·s uniques',
+                value=f'**Total:** {stats["total_unique_participants"]}',
+                inline=True
+            )
+            
+            embed.add_field(
+                name='📈 Moyenne de participation',
+                value=f'**{stats["average_participants"]:.1f}** personnes par soirée',
+                inline=True
+            )
+            
+            # Top participants
+            if stats['top_participants']:
+                top_5 = stats['top_participants'][:5]
+                medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣']
+                top_text = '\n'.join(
+                    f'{medals[i]} **{name}** - {count} soirées' 
+                    for i, (name, count) in enumerate(top_5)
+                )
+                embed.add_field(
+                    name='🏆 Top 5 des participant·e·s',
+                    value=top_text,
+                    inline=False
+                )
+            
+            # Tendance récente
+            if stats['trend']:
+                trend_text = '\n'.join(
+                    f'**{t["month"]}**: {t["event_count"]} soirées, {t["avg_participants"]:.1f} personnes en moyenne'
+                    for t in stats['trend'][-3:]  # 3 derniers mois
+                )
+                embed.add_field(
+                    name='📊 Tendance récente',
+                    value=trend_text,
+                    inline=False
+                )
+            
+            # Événements récents
+            if stats['recent_events']:
+                recent_text = '\n'.join(
+                    f'**{e["date"][:10]}** - {e["participant_count"]} participant·e·s'
+                    for e in stats['recent_events'][:3]
+                )
+                embed.add_field(
+                    name='📅 Dernières soirées',
+                    value=recent_text,
+                    inline=False
+                )
+            
+            if stats['first_event_date']:
+                embed.set_footer(text=f'Première soirée enregistrée: {stats["first_event_date"][:10]}')
+            
+            await ctx.send(embed=embed)
+    
+    except Exception as error:
+        print(f"❌ Erreur lors de l'affichage des stats: {error}")
+        await ctx.send(f"❌ Erreur: {error}")
+
+
 @bot.command(name='list-events')
 async def list_events_command(ctx):
     """Commande pour lister tous les événements Discord avec leurs IDs."""
@@ -1080,6 +1216,11 @@ async def plateau_help_command(ctx):
     embed.add_field(
         name='!list-events',
         value='Liste tous les événements Discord avec leurs IDs',
+        inline=False
+    )
+    embed.add_field(
+        name='!stats [nom]',
+        value='Affiche les statistiques générales ou d\'un·e participant·e',
         inline=False
     )
     embed.add_field(

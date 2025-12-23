@@ -48,6 +48,19 @@ build/
 .github-token-*
 tokens/
 .DS_Store
+
+# Statistics data (generated at runtime)
+stats.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
 .vscode/
 .idea/
 tmp/

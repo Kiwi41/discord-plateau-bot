@@ -36,8 +36,9 @@ graph LR
 - **🐳 Docker** : Déploiement conteneurisé sur NAS, cloud ou local
 - **🐍 Python 3.11+** : Code moderne et maintenable
 - **♾️ Écriture inclusive** : Logs et messages avec termes épicènes (participant·e·s)
+- **📊 Statistiques** : Suivi des participations, tendances et analyses
 
-## 🚀 Installation Rapide
+## 🚀 Installation Rapide+
 
 ```mermaid
 flowchart TD
@@ -204,6 +205,7 @@ Le bot détecte automatiquement les événements Discord existants et **crée au
 - `!plateau-next-month` : Alias pour !process-next-month
 - `!process-friday YYYY-MM-DD` : **Nouveau** - Traite un vendredi spécifique (ex: `!process-friday 2025-12-26`)
 - `!update-participants` : Force la mise à jour de la liste des inscriptions
+- `!stats [nom]` : **Nouveau** - Affiche les statistiques générales ou d'un·e participant·e spécifique
 - `!list-events` : Liste tous les événements Discord avec leurs IDs
 - `!plateau-help` : Affiche l'aide des commandes
 - `!test` : Teste la réception des messages
@@ -229,6 +231,110 @@ Alice, Bob, Charlie, David, Emma, Frank, Grace, Henry, Iris, Jack... et 2 autre(
 🔍 Récupération des participant·e·s pour l'événement
 👤 Participant·e trouvé·e sur l'événement principal: Alice
 ✅ Total: 12 personne·s inscrite·s (après déduplication)
+```
+
+## 📊 Statistiques
+
+Le bot collecte et analyse automatiquement les données de participation pour vous fournir des insights précieux sur vos soirées plateaux.
+
+### Fonctionnalités
+
+- **📈 Suivi automatique** : Les statistiques sont enregistrées à chaque mise à jour des participants
+- **💾 Persistance** : Stockage dans un fichier `stats.json` (ne pas supprimer !)
+- **🔍 Analyses détaillées** : Statistiques globales et individuelles
+- **📊 Tendances** : Évolution de la participation sur les derniers mois
+
+### Commande `!stats`
+
+**Statistiques globales** :
+```
+!stats
+```
+
+Affiche :
+- 🎲 **Nombre total d'événements** organisés
+- 👥 **Participant·e·s uniques** (nombre total de personnes différentes)
+- 📈 **Moyenne de participation** par soirée
+- 🏆 **Top 5 des participant·e·s** les plus régulier·e·s
+- 📊 **Tendance récente** (3 derniers mois)
+- 📅 **Dernières soirées** avec leur participation
+
+**Statistiques individuelles** :
+```
+!stats Alice
+```
+
+Affiche pour un·e participant·e :
+- 📈 **Nombre total de participations**
+- 📅 **Date de première participation**
+- 🗓️ **Liste des 5 dernières participations**
+
+### Exemple d'affichage
+
+```
+📊 Statistiques des Soirées Plateaux
+
+🎲 Événements
+Total: 24 soirées organisées
+
+👥 Participant·e·s uniques
+Total: 18
+
+📈 Moyenne de participation
+8.5 personnes par soirée
+
+🏆 Top 5 des participant·e·s
+🥇 Alice - 22 soirées
+🥈 Bob - 19 soirées
+🥉 Charlie - 17 soirées
+4️⃣ David - 15 soirées
+5️⃣ Emma - 14 soirées
+
+📊 Tendance récente
+2024-10: 4 soirées, 9.2 personnes en moyenne
+2024-11: 4 soirées, 8.5 personnes en moyenne
+2024-12: 3 soirées, 7.3 personnes en moyenne
+
+📅 Dernières soirées
+2024-12-20 - 8 participant·e·s
+2024-12-13 - 7 participant·e·s
+2024-12-06 - 7 participant·e·s
+
+Première soirée enregistrée: 2024-06-07
+```
+
+### Données collectées
+
+Pour chaque événement :
+- 📅 Date de la soirée
+- 📝 Nom de l'événement
+- 👥 Liste des participant·e·s
+- 🔢 Nombre de participant·e·s
+- 🆔 ID de l'événement Discord
+
+Pour chaque participant·e :
+- 📊 Nombre total de participations
+- 🗓️ Liste des dates de participation
+- 📅 Date de première participation
+
+### Gestion du fichier `stats.json`
+
+Le fichier `stats.json` contient toutes les statistiques historiques :
+- ⚠️ **Ne pas supprimer** ce fichier, il contient tout l'historique
+- 💾 **Sauvegardes recommandées** : Copier régulièrement ce fichier
+- 📦 **Docker** : Monter un volume pour persister les données entre redémarrages
+- 🔒 **Lecture seule** : Ne pas modifier manuellement (risque de corruption)
+
+**Structure du fichier** :
+```json
+{
+  "events": [...],           // Liste de tous les événements
+  "participants": {...},     // Stats par participant·e
+  "metadata": {
+    "first_event": "...",    // Date du premier événement
+    "last_updated": "..."    // Dernière mise à jour
+  }
+}
 ```
 
 ## 🔧 Technologies utilisées
@@ -286,6 +392,8 @@ graph TB
 ```
 .
 ├── bot.py                      # Code principal du bot Python
+├── stats_manager.py            # Gestionnaire de statistiques
+├── stats.json                  # Données statistiques (généré automatiquement)
 ├── requirements.txt            # Dépendances Python
 ├── Dockerfile.python           # Configuration Docker
 ├── docker-compose.python.yml   # Orchestration Docker
