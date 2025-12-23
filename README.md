@@ -29,10 +29,13 @@ graph LR
 
 - **📅 Création automatique** : Posts hebdomadaires chaque samedi à 3h00
 - **🎯 Intégration forum** : Utilise les forums Discord natifs
+- **🎉 Création automatique d'événements** : Crée des événements Discord individuels si aucun n'existe
 - **🔗 Liens automatiques** : Vers les événements Discord et inscription
-- **⚡ Commandes manuelles** : Création manuelle et gestion avancée
+- **👥 Suivi des participant·e·s** : Mise à jour automatique des inscriptions toutes les 15 minutes
+- **⚡ Commandes manuelles** : Création manuelle et gestion avancée (y compris traitement de vendredis spécifiques)
 - **🐳 Docker** : Déploiement conteneurisé sur NAS, cloud ou local
 - **🐍 Python 3.11+** : Code moderne et maintenable
+- **♾️ Écriture inclusive** : Logs et messages avec termes épicènes (participant·e·s)
 
 ## 🚀 Installation Rapide
 
@@ -105,9 +108,21 @@ DISCORD_TOKEN=votre_token_bot
 GUILD_ID=votre_guild_id
 FORUM_CHANNEL_ID=votre_forum_channel_id
 REGISTRATION_URL=https://votre-lien-inscription.com
-EVENT_ID=votre_event_id_optionnel
+EVENT_ID=                        # Optionnel - Déprécié (événements créés automatiquement)
+EVENT_DESCRIPTION=🎲 Soirée Plateaux du Vendredi ! 🎲\nTu aimes les jeux...  # Description des événements créés automatiquement
+EVENT_LOCATION=Le Cube en Bois – https://www.google.com/maps/...              # Lieu des événements avec URL Google Maps
 TIMEZONE=Europe/Paris
+DRY_RUN=false                    # Mode test (true) pour voir les actions sans modifier Discord
+AUTO_PROCESS=false               # Traitement automatique au démarrage (false recommandé)
 ```
+
+### Variables importantes
+
+- **EVENT_DESCRIPTION** : Texte de description pour les événements créés automatiquement (utiliser `\n` pour les sauts de ligne)
+- **EVENT_LOCATION** : Lieu avec format `Nom – URL Google Maps` pour les événements externes
+- **EVENT_ID** : **Déprécié** - Le bot crée maintenant des événements individuels automatiquement
+- **DRY_RUN** : `true` pour tester sans modifier Discord, `false` pour production
+- **AUTO_PROCESS** : `true` pour traiter automatiquement les 4 vendredis au démarrage
 
 ### 🔑 Obtenir les tokens Discord
 
@@ -118,13 +133,44 @@ TIMEZONE=Europe/Paris
 
 3. **Forum Channel ID** : Clic droit sur votre canal forum → "Copier l'identifiant"
 
-4. **Event ID** (optionnel) : ID de l'événement récurrent Discord
+4. **Permissions du Bot** : Le bot nécessite les permissions suivantes :
+   - ✅ Send Messages
+   - ✅ Create Public Threads
+   - ✅ Send Messages in Threads
+   - ✅ **Manage Events** (pour créer automatiquement les événements)
+   - ✅ Read Message History
+   - ✅ View Channels
 
-### 📅 Format des Événements Discord
+### 🎉 Création Automatique d'Événements
 
-Le bot détecte automatiquement les événements Discord et les lie aux posts de forum. Pour qu'un événement soit reconnu, il doit :
+**Nouveauté** : Le bot crée maintenant automatiquement des événements Discord individuels pour chaque vendredi si aucun événement n'existe.
 
-**Critères de détection** :
+**Configuration** :
+- **EVENT_DESCRIPTION** : Le texte de description de l'événement (utiliser `\n` pour les sauts de ligne)
+- **EVENT_LOCATION** : Lieu au format `Nom – URL Google Maps`
+- Les événements sont créés avec :
+  - 📅 Date : Le vendredi ciblé
+  - 🕖 Heure : 20:30 - 00:30 (4 heures)
+  - 📍 Type : Événement externe
+  - 📝 Description personnalisée depuis EVENT_DESCRIPTION
+
+**Avantages** :
+- ✅ Plus besoin d'événement récurrent
+- ✅ Suivi précis des inscriptions par soirée
+- ✅ Description personnalisée pour chaque événement
+- ✅ Création automatique si l'événement n'existe pas
+
+### 📅 Détection et Création des Événements Discord
+
+Le bot détecte automatiquement les événements Discord existants et **crée automatiquement** de nouveaux événements si aucun n'est trouvé.
+
+**Processus** :
+1. 🔍 Le bot recherche un événement Discord pour le vendredi ciblé
+2. ✨ Si aucun événement n'existe → **Création automatique** d'un nouvel événement
+3. 🔗 Si un événement existe → Utilisation de cet événement
+4. 📝 Le post du forum est lié à l'événement (existant ou créé)
+
+**Critères de détection des événements existants** :
 1. ✅ **Date** : L'événement doit être programmé le vendredi ciblé
 2. ✅ **Nom** : Doit contenir l'un de ces mots-clés (insensible à la casse) :
    - `plateau`
@@ -142,20 +188,23 @@ Le bot détecte automatiquement les événements Discord et les lie aux posts de
 - ❌ "Réunion" (pas de mot-clé)
 - ❌ "Cinema" (pas de mot-clé)
 
-**Configuration dans Discord** :
-1. Créer un événement sur votre serveur
-2. Date : Le vendredi souhaité (18h00 recommandé)
-3. Nom : Inclure un mot-clé (ex: "Soirée Plateaux")
-4. Le bot détectera et liera automatiquement l'événement au post
+**Événements créés automatiquement** :
+- 📅 Nom : "Soirée Plateaux - Vendredi DD mois AAAA"
+- 🕖 Horaire : 20:30 - 00:30 (4 heures)
+- 📍 Lieu : Configuré dans EVENT_LOCATION (événement externe)
+- 📝 Description : Configurée dans EVENT_DESCRIPTION
+- 🔒 Visibilité : Serveur uniquement
 
-**Note** : Si aucun événement n'est trouvé, le post sera créé sans lien événement, avec juste le lien d'inscription configuré dans `REGISTRATION_URL`.
+**Note** : Les événements créés automatiquement sont des événements individuels (non récurrents), permettant un meilleur suivi des inscriptions par soirée.
 
 ## 📝 Commandes disponibles
 
 - `!create-plateau-post` : Crée ou met à jour le post pour le prochain vendredi
 - `!process-next-month` : Traite les 4 prochains vendredis (création + mise à jour)
 - `!plateau-next-month` : Alias pour !process-next-month
+- `!process-friday YYYY-MM-DD` : **Nouveau** - Traite un vendredi spécifique (ex: `!process-friday 2025-12-26`)
 - `!update-participants` : Force la mise à jour de la liste des inscriptions
+- `!list-events` : Liste tous les événements Discord avec leurs IDs
 - `!plateau-help` : Affiche l'aide des commandes
 - `!test` : Teste la réception des messages
 
@@ -163,15 +212,23 @@ Le bot détecte automatiquement les événements Discord et les lie aux posts de
 
 Le bot met à jour automatiquement la liste des personnes inscrites dans les posts de forum :
 - ✅ **Vérification automatique** : Toutes les 15 minutes
-- 👤 **Source** : Utilisateurs inscrits aux événements Discord
+- 👤 **Source** : Utilisateur·rice·s inscrit·e·s aux événements Discord
 - 📊 **Affichage** : Nombre + noms des personnes (max 10 affichés)
 - 🔄 **Temps réel** : Les posts se mettent à jour dès qu'une personne s'inscrit ou se désinscrit
+- ♾️ **Écriture inclusive** : Le bot utilise des termes épicènes dans les logs (participant·e·s, inscrit·e·s)
 
 **Exemple dans le post** :
 ```
 👥 Inscriptions
 12 personne(s) inscrite(s)
 Alice, Bob, Charlie, David, Emma, Frank, Grace, Henry, Iris, Jack... et 2 autre(s)
+```
+
+**Dans les logs** :
+```
+🔍 Récupération des participant·e·s pour l'événement
+👤 Participant·e trouvé·e sur l'événement principal: Alice
+✅ Total: 12 personne·s inscrite·s (après déduplication)
 ```
 
 ## 🔧 Technologies utilisées
