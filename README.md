@@ -206,6 +206,7 @@ Le bot détecte automatiquement les événements Discord existants et **crée au
 - `!process-friday YYYY-MM-DD` : **Nouveau** - Traite un vendredi spécifique (ex: `!process-friday 2025-12-26`)
 - `!update-participants` : Force la mise à jour de la liste des inscriptions
 - `!stats [nom]` : **Nouveau** - Affiche les statistiques générales ou d'un·e participant·e spécifique
+- `!rebuild-stats` : **Nouveau** - Reconstruit les statistiques depuis les posts Discord existants
 - `!list-events` : Liste tous les événements Discord avec leurs IDs
 - `!plateau-help` : Affiche l'aide des commandes
 - `!test` : Teste la réception des messages
@@ -324,6 +325,26 @@ Le fichier `stats.json` contient toutes les statistiques historiques :
 - 💾 **Sauvegardes recommandées** : Copier régulièrement ce fichier
 - 📦 **Docker** : Monter un volume pour persister les données entre redémarrages
 - 🔒 **Lecture seule** : Ne pas modifier manuellement (risque de corruption)
+- 🔄 **Récupération possible** : Si perdu, utilisez `!rebuild-stats` pour reconstruire depuis Discord
+
+### Récupération des statistiques perdues
+
+Si vous avez perdu le fichier `stats.json`, vous pouvez le reconstruire partiellement :
+
+```
+!rebuild-stats
+```
+
+Cette commande :
+- ✅ Parcourt tous les posts du forum (y compris archivés)
+- ✅ Identifie les événements Discord correspondants
+- ✅ Récupère les participant·e·s actuels de chaque événement
+- ✅ Reconstruit le fichier stats.json
+
+**Limitations** :
+- ⚠️ Ne récupère que les événements encore visibles dans Discord
+- ⚠️ Les participants sont ceux actuellement inscrits (pas l'historique des changements)
+- ⚠️ Certains événements passés peuvent ne plus être accessibles
 
 **Structure du fichier** :
 ```json

@@ -83,6 +83,37 @@ Affiche :
 - 📅 Date de première participation
 - 🗓️ Liste des 5 dernières participations
 
+### Reconstruction des statistiques
+```
+!rebuild-stats
+```
+
+**Fonction** : Reconstruit le fichier `stats.json` depuis les posts Discord existants.
+
+**Utilisation** :
+- 🔄 Après perte du fichier stats.json
+- 📊 Pour récupérer l'historique depuis Discord
+- 🆕 Après installation sur un nouveau serveur avec historique
+
+**Processus** :
+1. Parcourt tous les threads du forum (actifs et archivés)
+2. Identifie les posts "Soirée Plateaux"
+3. Trouve les événements Discord correspondants (par date)
+4. Récupère les participant·e·s actuellement inscrit·e·s
+5. Reconstruit le fichier stats.json
+
+**Limitations** :
+- ⚠️ Ne récupère que les événements encore visibles dans Discord
+- ⚠️ Participant·e·s actuels uniquement (pas l'historique des changements)
+- ⚠️ Discord limite l'accès aux anciens événements (environ 1 an)
+- ⏱️ Peut prendre plusieurs minutes pour un grand historique
+
+**Exemple de résultat** :
+```
+✅ Statistiques reconstruites: 18 événement(s) récupéré(s)
+⚠️ 2 erreur(s) rencontrée(s)
+```
+
 **Exemple d'affichage** :
 ```
 📊 Statistiques de Alice
@@ -158,6 +189,7 @@ Total: 22 soirées
 2. **Sauvegardes régulières** : Copier le fichier avant chaque mise à jour majeure
 3. **Lecture seule** : Ne pas modifier manuellement (risque de corruption)
 4. **Ajout au .gitignore** : Le fichier est exclu du dépôt Git
+5. **Récupération possible** : Utilisez `!rebuild-stats` si le fichier est perdu
 
 ### 💾 Persistance avec Docker
 
@@ -202,6 +234,26 @@ mv stats.json stats.backup.$(date +%Y%m%d).json
 # Le bot créera un nouveau fichier au prochain événement
 docker compose restart
 ```
+
+#### Récupérer les statistiques depuis Discord
+```
+!rebuild-stats
+```
+
+Cette commande reconstruit partiellement les statistiques depuis :
+- Les posts du forum (actifs et archivés)
+- Les événements Discord correspondants
+- Les inscriptions actuelles
+
+**Avantages** :
+- 🔄 Récupération automatique sans manipulation manuelle
+- 📊 Reconstruction partielle de l'historique
+- ✅ Fonctionne même si stats.json est corrompu
+
+**Inconvénients** :
+- ⏳ Peut être lent avec beaucoup d'événements
+- 📅 Limité aux événements encore accessibles dans Discord
+- 👥 Ne capture que les inscriptions actuelles, pas les changements historiques
 
 #### Fusionner des statistiques
 Si vous avez plusieurs fichiers stats et souhaitez les fusionner :

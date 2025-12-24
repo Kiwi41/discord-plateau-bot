@@ -1024,6 +1024,123 @@ async def process_friday_command(ctx, date_str: str):
         await ctx.send(f"❌ Erreur: {str(e)}")
 
 
+@bot.command(name='rebuild-stats')
+async def rebuild_stats_command(ctx):
+    """Commande pour reconstruire les statistiques depuis les posts Discord existants."""
+    await ctx.reply("🔄 Reconstruction des statistiques en cours...")
+    
+    try:
+        guild = bot.get_guild(GUILD_ID)
+        if not guild:
+            await ctx.send("❌ Serveur Discord non trouvé")
+            return
+        
+        forum_channel = guild.get_channel(FORUM_CHANNEL_ID)
+        if not forum_channel:
+            await ctx.send("❌ Canal forum non trouvé")
+            return
+        
+        # Récupérer tous les événements Discord
+        all_events = await fetch_discord_events_with_retry(guild)
+        
+        # Compteurs
+        stats_rebuilt = 0
+        errors = 0
+        
+        # Parcourir tous les threads du forum (archivés inclus)
+        async for thread in forum_channel.archived_threads(limit=None):
+            await asyncio.sleep(0.5)  # Rate limiting
+            
+            # Vérifier si c'est un post de soirée plateau
+            if "soirée plateaux" in thread.name.lower():
+                try:
+                    # Extraire la date du titre
+                    # Format: "Soirée Plateaux - Vendredi DD mois AAAA"
+                    import re
+                    date_match = re.search(r'(\d{1,2})\s+(\w+)\s+(\d{4})', thread.name)
+                    if not date_match:
+                        continue
+                    
+                    # Trouver l'événement correspondant
+                    # Essayer de matcher par date proche
+                    thread_created = thread.created_at
+                    matched_event = None
+                    
+                    for event in all_events:
+                        if event.start_time and abs((event.start_time.date() - thread_created.date()).days) <= 7:
+                            if any(keyword in event.name.lower() for keyword in ['plateau', 'soirée', 'soiree', 'jeu', 'board', 'game']):
+                                matched_event = event
+                                break
+                    
+                    if matched_event:
+                        # Récupérer les participants
+                        participants = await get_event_participants(matched_event)
+                        participant_names = [p.display_name for p in participants]
+                        
+                        # Enregistrer dans les stats
+                        event_date = matched_event.start_time.isoformat()
+                        stats_manager.record_event(
+                            event_date=event_date,
+                            event_name=thread.name,
+                            participants=participant_names,
+                            event_id=str(matched_event.id)
+                        )
+                        stats_rebuilt += 1
+                        print(f"✅ Stats reconstruites: {thread.name} - {len(participant_names)} participant·e·s")
+                
+                except Exception as e:
+                    errors += 1
+                    print(f"⚠️ Erreur pour {thread.name}: {e}")
+        
+        # Traiter aussi les threads actifs
+        for thread in forum_channel.threads:
+            if "soirée plateaux" in thread.name.lower():
+                try:
+                    import re
+                    date_match = re.search(r'(\d{1,2})\s+(\w+)\s+(\d{4})', thread.name)
+                    if not date_match:
+                        continue
+                    
+                    thread_created = thread.created_at
+                    matched_event = None
+                    
+                    for event in all_events:
+                        if event.start_time and abs((event.start_time.date() - thread_created.date()).days) <= 7:
+                            if any(keyword in event.name.lower() for keyword in ['plateau', 'soirée', 'soiree', 'jeu', 'board', 'game']):
+                                matched_event = event
+                                break
+                    
+                    if matched_event:
+                        participants = await get_event_participants(matched_event)
+                        participant_names = [p.display_name for p in participants]
+                        
+                        event_date = matched_event.start_time.isoformat()
+                        stats_manager.record_event(
+                            event_date=event_date,
+                            event_name=thread.name,
+                            participants=participant_names,
+                            event_id=str(matched_event.id)
+                        )
+                        stats_rebuilt += 1
+                        print(f"✅ Stats reconstruites: {thread.name} - {len(participant_names)} participant·e·s")
+                
+                except Exception as e:
+                    errors += 1
+                    print(f"⚠️ Erreur pour {thread.name}: {e}")
+        
+        # Message final
+        if stats_rebuilt > 0:
+            await ctx.send(f"✅ Statistiques reconstruites: {stats_rebuilt} événement(s) récupéré(s)")
+            if errors > 0:
+                await ctx.send(f"⚠️ {errors} erreur(s) rencontrée(s)")
+        else:
+            await ctx.send("ℹ️ Aucune statistique récupérée")
+    
+    except Exception as error:
+        print(f"❌ Erreur lors de la reconstruction des stats: {error}")
+        await ctx.send(f"❌ Erreur: {error}")
+
+
 @bot.command(name='stats')
 async def stats_command(ctx, participant_name: str = None):
     """Commande pour afficher les statistiques des soirées plateaux."""
@@ -1221,6 +1338,11 @@ async def plateau_help_command(ctx):
     embed.add_field(
         name='!stats [nom]',
         value='Affiche les statistiques générales ou d\'un·e participant·e',
+        inline=False
+    )
+    embed.add_field(
+        name='!rebuild-stats',
+        value='Reconstruit les statistiques depuis les posts Discord',
         inline=False
     )
     embed.add_field(
