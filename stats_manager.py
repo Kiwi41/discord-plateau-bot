@@ -155,24 +155,33 @@ class StatsManager:
             Liste de dict avec {month: str, count: int, avg_participants: float}
         """
         from datetime import datetime, timedelta
+        import pytz
         
-        # Calculer la date limite
-        now = datetime.now()
+        # Calculer la date limite (timezone-aware)
+        now = datetime.now(pytz.UTC)
         limit_date = now - timedelta(days=months * 30)
         
         # Grouper les événements par mois
         monthly_data = {}
         for event in self.data['events']:
-            event_date = datetime.fromisoformat(event['date'])
-            if event_date >= limit_date:
-                month_key = event_date.strftime('%Y-%m')
-                if month_key not in monthly_data:
-                    monthly_data[month_key] = {
-                        'count': 0,
-                        'total_participants': 0
-                    }
-                monthly_data[month_key]['count'] += 1
-                monthly_data[month_key]['total_participants'] += event['participant_count']
+            try:
+                event_date = datetime.fromisoformat(event['date'])
+                # S'assurer que la date est timezone-aware
+                if event_date.tzinfo is None:
+                    event_date = pytz.UTC.localize(event_date)
+                
+                if event_date >= limit_date:
+                    month_key = event_date.strftime('%Y-%m')
+                    if month_key not in monthly_data:
+                        monthly_data[month_key] = {
+                            'count': 0,
+                            'total_participants': 0
+                        }
+                    monthly_data[month_key]['count'] += 1
+                    monthly_data[month_key]['total_participants'] += event['participant_count']
+            except Exception as e:
+                print(f"⚠️ Erreur lors du traitement de l'événement {event.get('name', 'inconnu')}: {e}")
+                continue
         
         # Calculer les moyennes
         result = []
