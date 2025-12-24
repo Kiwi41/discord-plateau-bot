@@ -1141,6 +1141,24 @@ async def rebuild_stats_command(ctx):
         await ctx.send(f"❌ Erreur: {error}")
 
 
+@bot.command(name='clean-stats')
+async def clean_stats_command(ctx):
+    """Commande pour nettoyer les doublons dans les statistiques."""
+    await ctx.reply("🧹 Nettoyage des doublons en cours...")
+    
+    try:
+        duplicates_count = stats_manager.remove_duplicates()
+        
+        if duplicates_count > 0:
+            await ctx.send(f"✅ {duplicates_count} doublon(s) supprimé(s)")
+        else:
+            await ctx.send("ℹ️ Aucun doublon trouvé")
+    
+    except Exception as error:
+        print(f"❌ Erreur lors du nettoyage des stats: {error}")
+        await ctx.send(f"❌ Erreur: {error}")
+
+
 @bot.command(name='stats')
 async def stats_command(ctx, participant_name: str = None):
     """Commande pour afficher les statistiques des soirées plateaux."""
@@ -1343,6 +1361,11 @@ async def plateau_help_command(ctx):
     embed.add_field(
         name='!rebuild-stats',
         value='Reconstruit les statistiques depuis les posts Discord',
+        inline=False
+    )
+    embed.add_field(
+        name='!clean-stats',
+        value='Nettoie les doublons dans les statistiques',
         inline=False
     )
     embed.add_field(

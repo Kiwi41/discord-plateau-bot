@@ -58,22 +58,38 @@ class StatsManager:
             participants: Liste des noms des participant·e·s
             event_id: ID Discord de l'événement (optionnel)
         """
-        # Vérifier si l'événement existe déjà
-        event_exists = any(
-            e.get('date') == event_date and e.get('name') == event_name 
-            for e in self.data['events']
-        )
+        # Normaliser le nom de l'événement (insensible à la casse, sans espaces multiples)
+        normalized_name = ' '.join(event_name.lower().split())
         
-        if event_exists:
+        # Extraire seulement la date (sans l'heure) pour comparaison
+        event_date_only = event_date.split('T')[0] if 'T' in event_date else event_date
+        
+        # Vérifier si l'événement existe déjà (par event_id, ou par date+nom, ou par date seule avec nom similaire)
+        existing_event = None
+        for e in self.data['events']:
+            # Correspondance par event_id (prioritaire)
+            if event_id and e.get('event_id') == event_id:
+                existing_event = e
+                break
+            
+            # Correspondance par date + nom normalisé
+            e_date_only = e.get('date', '').split('T')[0] if 'T' in e.get('date', '') else e.get('date', '')
+            e_normalized_name = ' '.join(e.get('name', '').lower().split())
+            
+            if e_date_only == event_date_only and e_normalized_name == normalized_name:
+                existing_event = e
+                break
+        
+        if existing_event:
             # Mettre à jour l'événement existant
-            for event in self.data['events']:
-                if event.get('date') == event_date and event.get('name') == event_name:
-                    event['participants'] = participants
-                    event['participant_count'] = len(participants)
-                    event['updated_at'] = datetime.now().isoformat()
-                    if event_id:
-                        event['event_id'] = event_id
-                    break
+            existing_event['participants'] = participants
+            existing_event['participant_count'] = len(participants)
+            existing_event['updated_at'] = datetime.now().isoformat()
+            if event_id and not existing_event.get('event_id'):
+                existing_event['event_id'] = event_id
+            # Mettre à jour le nom si nécessaire (garder la version avec majuscules)
+            if event_name != existing_event['name']:
+                existing_event['name'] = event_name
         else:
             # Créer un nouvel événement
             event_data = {
@@ -105,6 +121,43 @@ class StatsManager:
         
         self._save_stats()
         print(f"📊 Stats enregistrées: {event_name} - {len(participants)} participant·e·s")
+    
+    def remove_duplicates(self) -> int:
+        """
+        Supprime les événements en double basés sur la date et le nom.
+        
+        Returns:
+            Nombre de doublons supprimés
+        """
+        unique_events = {}
+        duplicates_count = 0
+        
+        for event in self.data['events']:
+            # Créer une clé unique basée sur la date (sans heure) et le nom normalisé
+            event_date_only = event.get('date', '').split('T')[0]
+            event_name_normalized = ' '.join(event.get('name', '').lower().split())
+            key = (event_date_only, event_name_normalized)
+            
+            if key not in unique_events:
+                unique_events[key] = event
+            else:
+                # Garder l'événement le plus récent (avec updated_at ou created_at)
+                existing = unique_events[key]
+                current_time = event.get('updated_at', event.get('created_at', ''))
+                existing_time = existing.get('updated_at', existing.get('created_at', ''))
+                
+                if current_time > existing_time:
+                    unique_events[key] = event
+                duplicates_count += 1
+        
+        # Remplacer la liste des événements par les événements uniques
+        self.data['events'] = list(unique_events.values())
+        
+        if duplicates_count > 0:
+            self._save_stats()
+            print(f"🧹 {duplicates_count} doublon(s) supprimé(s)")
+        
+        return duplicates_count
     
     def get_total_events(self) -> int:
         """Retourne le nombre total d'événements enregistrés."""
